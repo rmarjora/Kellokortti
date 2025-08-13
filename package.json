@@ -1,0 +1,19 @@
+{
+  "name": "Kellokortti",
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "scripts": {
+    "react-dev": "vite",
+    "electron-dev": "cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "dev": "concurrently \"npm run react-dev\" \"npm run electron-dev\"",
+    "build": "vite build",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^8.0.0",
+    "cross-env": "^7.0.3",
+    "electron": "^31.0.0",
+    "vite": "^7.1.2"
+  }
+}
