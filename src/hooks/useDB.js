@@ -1,17 +1,43 @@
+
 import { useState, useEffect } from "react";
 
 const useDB = () => {
   const [people, setPeople] = useState([]);
 
+
   useEffect(() => {
-    setPeople(window.api.invoke("getPeople"));
+    const fetchPersons = async () => {
+      try {
+        const persons = await window.api.getPersons();
+        setPeople(persons);
+      } catch (error) {
+        console.error('Failed to fetch persons:', error);
+      }
+    };
+    fetchPersons();
   }, []);
 
-  const addPerson = (person) => {
-    window.api.invoke("addPerson", person);
+
+  const addPerson = async (person) => {
+    try {
+      const newPerson = await window.api.addPerson(person);
+      setPeople(prev => [...prev, newPerson]);
+    } catch (error) {
+      console.error('Failed to add person:', error);
+    }
   };
 
-  return { people, addPerson };
+
+  const clearPersons = async () => {
+    try {
+      await window.api.clearPersons();
+      setPeople([]);
+    } catch (error) {
+      console.error('Failed to clear persons:', error);
+    }
+  };
+
+  return { people, addPerson, clearPersons };
 };
 
 export default useDB;

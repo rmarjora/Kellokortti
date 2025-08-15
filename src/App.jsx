@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import NameList from './components/NameList';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -20,9 +21,7 @@ function App() {
     <div style={{ padding: '2rem' }}>
       <h1>Users</h1>
   <button onClick={addPerson}>Add Person</button>
-      <ul>
-        {users.map(u => <li key={u.id}>{u.name}</li>)}
-      </ul>
+      <NameList />
   <button onClick={clearPersons}>Clear persons</button>
     </div>
   );

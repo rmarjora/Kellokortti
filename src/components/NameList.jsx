@@ -1,14 +1,16 @@
 import ClickableName from "./ClickableName";
-import db from "../hooks/useDB";
+import useDB from "../hooks/useDB";
 
 const NameList = () => {
-  const db = useDB();
+  const { people, addPerson, clearPersons } = useDB();
 
   return (
     <div className="name-list">
-      {db.people.map((person, index) => (
-        <ClickableName key={index} name={person.name} onClick={() => db.addPerson(person)} />
+      {people.map((person, index) => (
+        <ClickableName key={index} name={person.name} onClick={() => addPerson(person)} />
       ))}
+      {/* Optionally, add a button to clear all persons */}
+      {/* <button onClick={clearPersons}>Clear All</button> */}
     </div>
   );
 };
