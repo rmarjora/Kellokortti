@@ -1,13 +1,34 @@
+import { useState } from 'react';
 import useDB from './hooks/useDB';
 import NameList from './components/NameList';
 
 function App() {
   const { people, addPerson, clearPersons } = useDB();
+  const [nameInput, setNameInput] = useState('');
 
   return (
     <div style={{ padding: '2rem' }}>
-  <h1>Users</h1>
-  <button onClick={() => addPerson({ name: 'Alice' })}>Add Person</button>
+      <h1>Users</h1>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
+        <input
+          type="text"
+          placeholder="Enter name"
+          value={nameInput}
+          onChange={(e) => setNameInput(e.target.value)}
+          style={{ padding: '0.5rem', flex: '0 0 200px' }}
+        />
+        <button
+          onClick={() => {
+            const name = nameInput.trim();
+            if (!name) return;
+            addPerson({ name });
+            setNameInput('');
+          }}
+          disabled={!nameInput.trim()}
+        >
+          Add Person
+        </button>
+      </div>
   <NameList people={people} addPerson={addPerson} />
   <button onClick={clearPersons}>Clear persons</button>
     </div>
