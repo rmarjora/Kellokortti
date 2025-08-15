@@ -1,30 +1,26 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const db = require('./db');
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    },
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    // Development: React dev server
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    // Production: Load built React files
-    win.loadFile(path.join(__dirname, '../dist/index.html'));
-  }
+  const devServerURL = process.env.VITE_DEV_SERVER_URL;
+  win.loadURL(devServerURL || `file://${path.join(__dirname, '../dist/index.html')}`);
 }
 
-app.whenReady().then(createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.whenReady().then(() => {
+  db.initDatabase();
+  createWindow();
 });
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
+// IPC handlers
+ipcMain.handle('get-users', () => db.getUsers());
+ipcMain.handle('add-user', (event, user) => db.addUser(user));

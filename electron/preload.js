@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  ping: () => ipcRenderer.send('ping'),
+contextBridge.exposeInMainWorld('api', {
+  getUsers: () => ipcRenderer.invoke('get-users'),
+  addUser: (user) => ipcRenderer.invoke('add-user', user)
 });
