@@ -9,8 +9,7 @@ function initDatabase() {
   db = new Database(dbPath);
   db.prepare(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT
+    name TEXT
   )`).run();
 }
 
@@ -19,9 +18,13 @@ function getUsers() {
 }
 
 function addUser(user) {
-  const stmt = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)');
-  const info = stmt.run(user.name, user.email);
+  const stmt = db.prepare('INSERT INTO users (name) VALUES (?)');
+  const info = stmt.run(user.name);
   return { id: info.lastInsertRowid, ...user };
 }
 
-module.exports = { initDatabase, getUsers, addUser };
+function clearUsers() {
+  db.prepare('DELETE FROM users').run();
+}
+
+module.exports = { initDatabase, getUsers, addUser, clearUsers };

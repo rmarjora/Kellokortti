@@ -12,13 +12,18 @@ function App() {
     window.api.addUser(newUser).then(user => setUsers(prev => [...prev, user]));
   };
 
+  const clearUsers = () => {
+    window.api.clearUsers().then(() => setUsers([]));
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Users</h1>
       <button onClick={addUser}>Add User</button>
       <ul>
-        {users.map(u => <li key={u.id}>{u.name} ({u.email})</li>)}
+        {users.map(u => <li key={u.id}>{u.name}</li>)}
       </ul>
+      <button onClick={clearUsers}>Clear users</button>
     </div>
   );
 }
