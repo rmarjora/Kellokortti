@@ -4,26 +4,26 @@ function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    window.api.getUsers().then(setUsers);
+  window.api.getPersons().then(setUsers);
   }, []);
 
-  const addUser = () => {
+  const addPerson = () => {
     const newUser = { name: 'Alice', email: 'alice@example.com' };
-    window.api.addUser(newUser).then(user => setUsers(prev => [...prev, user]));
+  window.api.addPerson(newUser).then(person => setUsers(prev => [...prev, person]));
   };
 
-  const clearUsers = () => {
-    window.api.clearUsers().then(() => setUsers([]));
+  const clearPersons = () => {
+  window.api.clearPersons().then(() => setUsers([]));
   };
 
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Users</h1>
-      <button onClick={addUser}>Add User</button>
+  <button onClick={addPerson}>Add Person</button>
       <ul>
         {users.map(u => <li key={u.id}>{u.name}</li>)}
       </ul>
-      <button onClick={clearUsers}>Clear users</button>
+  <button onClick={clearPersons}>Clear persons</button>
     </div>
   );
 }

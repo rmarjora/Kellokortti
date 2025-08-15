@@ -22,6 +22,6 @@ app.whenReady().then(() => {
 });
 
 // IPC handlers
-ipcMain.handle('get-users', () => db.getUsers());
-ipcMain.handle('add-user', (event, user) => db.addUser(user));
-ipcMain.handle('clear-users', () => db.clearUsers());
+ipcMain.handle('get-persons', () => db.getPersons());
+ipcMain.handle('add-person', (event, person) => db.addPerson(person));
+ipcMain.handle('clear-persons', () => db.clearPersons());

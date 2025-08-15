@@ -7,24 +7,27 @@ let db;
 function initDatabase() {
   const dbPath = path.join(app.getPath('userData'), 'app.db');
   db = new Database(dbPath);
-  db.prepare(`CREATE TABLE IF NOT EXISTS users (
+  db.prepare(`CREATE TABLE IF NOT EXISTS persons (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
   )`).run();
 }
 
-function getUsers() {
-  return db.prepare('SELECT * FROM users').all();
+
+function getPersons() {
+  return db.prepare('SELECT * FROM persons').all();
 }
 
-function addUser(user) {
-  const stmt = db.prepare('INSERT INTO users (name) VALUES (?)');
-  const info = stmt.run(user.name);
-  return { id: info.lastInsertRowid, ...user };
+
+function addPerson(person) {
+  const stmt = db.prepare('INSERT INTO persons (name) VALUES (?)');
+  const info = stmt.run(person.name);
+  return { id: info.lastInsertRowid, ...person };
 }
 
-function clearUsers() {
-  db.prepare('DELETE FROM users').run();
+
+function clearPersons() {
+  db.prepare('DELETE FROM persons').run();
 }
 
-module.exports = { initDatabase, getUsers, addUser, clearUsers };
+module.exports = { initDatabase, getPersons, addPerson, clearPersons };
