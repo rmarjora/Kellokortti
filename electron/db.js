@@ -7,10 +7,24 @@ let db;
 function initDatabase() {
   const dbPath = path.join(app.getPath('userData'), 'app.db');
   db = new Database(dbPath);
-  db.prepare(`CREATE TABLE IF NOT EXISTS persons (
+  db.exec(`CREATE TABLE IF NOT EXISTS persons (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT
-  )`).run();
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS supervisors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS persons_passwordhashes (
+    person_id INTEGER,
+    password_hash TEXT,
+    FOREIGN KEY (person_id) REFERENCES persons (id)
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS supervisors_passwordhashes (
+    supervisor_id INTEGER,
+    password_hash TEXT,
+    FOREIGN KEY (supervisor_id) REFERENCES supervisors (id)
+  )`)
 }
 
 
@@ -20,8 +34,7 @@ function getPersons() {
 
 
 function addPerson(person) {
-  const stmt = db.prepare('INSERT INTO persons (name) VALUES (?)');
-  const info = stmt.run(person.name);
+  const info = db.prepare('INSERT INTO persons (name) VALUES (?)').run([person.name]);
   return { id: info.lastInsertRowid, ...person };
 }
 

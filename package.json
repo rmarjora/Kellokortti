@@ -7,7 +7,8 @@
     "electron-dev": "cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "dev": "concurrently \"npm run react-dev\" \"npm run electron-dev\"",
     "build": "vite build",
-    "start": "electron ."
+    "start": "electron .",
+    "build:electron": "electron-builder"
   },
   "dependencies": {
     "better-sqlite3": "^12.2.0",
@@ -20,6 +21,7 @@
     "concurrently": "^8.0.0",
     "cross-env": "^7.0.3",
     "electron": "^31.7.7",
+    "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9",
     "vite": "^7.1.2"
   }

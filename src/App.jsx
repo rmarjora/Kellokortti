@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useDB from './hooks/useDB';
 import NameList from './components/NameList';
+import Login from './components/Login';
 
 function App() {
   const { people, addPerson, clearPersons } = useDB();
@@ -31,6 +32,7 @@ function App() {
       </div>
   <NameList people={people} addPerson={addPerson} />
   <button onClick={clearPersons}>Clear persons</button>
+  <Login />
     </div>
   );
 }
