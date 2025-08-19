@@ -2,42 +2,42 @@
 import { useState, useEffect } from "react";
 
 const useDB = () => {
-  const [people, setPeople] = useState([]);
+  const [users, setUsers] = useState([]);
 
 
   useEffect(() => {
-    const fetchPersons = async () => {
+    const fetchUsers = async () => {
       try {
-        const persons = await window.api.getPersons();
-        setPeople(persons);
+        const users = await window.api.getUsers();
+        setUsers(users);
       } catch (error) {
-        console.error('Failed to fetch persons:', error);
+        console.error('Failed to fetch users:', error);
       }
     };
-    fetchPersons();
+    fetchUsers();
   }, []);
 
 
-  const addPerson = async (person) => {
+  const addUser = async (user) => {
     try {
-      const newPerson = await window.api.addPerson(person);
-      setPeople(prev => [...prev, newPerson]);
+      const newUser = await window.api.addUser(user);
+      setUsers(prev => [...prev, newUser]);
     } catch (error) {
-      console.error('Failed to add person:', error);
+      console.error('Failed to add user:', error);
     }
   };
 
 
-  const clearPersons = async () => {
+  const clearUsers = async () => {
     try {
-      await window.api.clearPersons();
-      setPeople([]);
+      await window.api.clearUsers();
+      setUsers([]);
     } catch (error) {
-      console.error('Failed to clear persons:', error);
+      console.error('Failed to clear users:', error);
     }
   };
 
-  return { people, addPerson, clearPersons };
+  return { users, addUser, clearUsers };
 };
 
 export default useDB;

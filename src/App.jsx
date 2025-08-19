@@ -4,8 +4,10 @@ import NameList from './components/NameList';
 import Login from './components/Login';
 
 function App() {
-  const { people, addPerson, clearPersons } = useDB();
+  const { users, addUser, clearUsers } = useDB();
   const [nameInput, setNameInput] = useState('');
+
+  console.log('Users:', users);
 
   return (
     <div style={{ padding: '2rem' }}>
@@ -22,16 +24,16 @@ function App() {
           onClick={() => {
             const name = nameInput.trim();
             if (!name) return;
-            addPerson({ name });
+            addUser({ name });
             setNameInput('');
           }}
           disabled={!nameInput.trim()}
         >
-          Add Person
+          Add User
         </button>
       </div>
-  <NameList people={people} addPerson={addPerson} />
-  <button onClick={clearPersons}>Clear persons</button>
+  <NameList people={users} addPerson={addUser} />
+  <button onClick={clearUsers}>Clear users</button>
   <Login />
     </div>
   );

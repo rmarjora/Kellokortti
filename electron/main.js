@@ -22,6 +22,8 @@ app.whenReady().then(() => {
 });
 
 // IPC handlers
-ipcMain.handle('get-persons', () => db.getPersons());
-ipcMain.handle('add-person', (event, person) => db.addPerson(person));
-ipcMain.handle('clear-persons', () => db.clearPersons());
+ipcMain.handle('get-users', () => db.getUsers());
+ipcMain.handle('add-user', (event, user) => db.addUser(user));
+ipcMain.handle('get-password-hash', (event, userId) => db.getPasswordHash(userId));
+ipcMain.handle('set-password-hash', (event, userId, passwordHash) => db.setPasswordHash(userId, passwordHash));
+ipcMain.handle('clear-users', () => db.clearUsers());
