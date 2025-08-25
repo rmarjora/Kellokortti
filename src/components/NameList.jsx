@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ClickableName from "./ClickableName";
 import Popup from "./Popup";
 import PersonLogin from "./PersonLogin";
+import Clocking from "./Clocking";
 
 const NameList = ({ people }) => {
 
@@ -10,7 +11,8 @@ const NameList = ({ people }) => {
   }
 
     const [selectedPerson, setSelectedPerson] = useState(null);
-    const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [showClocking, setShowClocking] = useState(false);
 
     const handleNameClick = (person) => {
       console.log('Clicked person:', person);
@@ -20,14 +22,13 @@ const NameList = ({ people }) => {
 
     const handleCancel = () => {
       setShowPasswordPopup(false);
+      setShowClocking(false);
       setSelectedPerson(null);
     };
 
-    const handleSubmit = (password, person) => {
-      // TODO: validate password or send to backend as needed
-      // For now, just close the popup.
-      setShowPasswordPopup(false);
-      setSelectedPerson(null);
+    const handleLoginSuccess = (person) => {
+      // Switch to Clocking view within the same Popup
+      setShowClocking(true);
     };
 
     return (
@@ -39,8 +40,19 @@ const NameList = ({ people }) => {
             onClick={() => handleNameClick(person)}
           />
         ))}
-        <Popup open={showPasswordPopup} onClose={() => { setShowPasswordPopup(false); setSelectedPerson(null); }}>
-          <PersonLogin person={selectedPerson} />
+        <Popup open={showPasswordPopup} onClose={handleCancel}>
+          {!showClocking ? (
+            <PersonLogin person={selectedPerson} onSuccess={handleLoginSuccess} />
+          ) : (
+            <div>
+              <h3>{selectedPerson?.name}</h3>
+              <Clocking
+                person={selectedPerson}
+                onBreak={() => {/* TODO: implement break logic */}}
+                onClockOut={() => {/* TODO: implement clock out logic */}}
+              />
+            </div>
+          )}
         </Popup>
       </div>
     );

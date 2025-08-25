@@ -15,10 +15,17 @@ function initDatabase() {
     name TEXT,
     role TEXT NOT NULL CHECK (role IN ('student','supervisor','admin'))
   )`)
-  db.exec(`CREATE TABLE IF NOT EXISTS users_passwordhashes (
+  db.exec(`CREATE TABLE IF NOT EXISTS passwordhashes (
     user_id INTEGER,
     password_hash TEXT,
     FOREIGN KEY (user_id) REFERENCES users (id)
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS arrivalTimes (
+    arrival_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    arrival_time DATETIME NOT NULL,
+    supervisor_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(id)
   )`)
 }
 
@@ -33,24 +40,40 @@ function addUser(user) {
   return { id: info.lastInsertRowid, ...user };
 }
 
+function clearUsers() {
+  db.prepare('DELETE FROM users').run();
+}
+
 function hasPassword(userId) {
-  const row = db.prepare('SELECT password_hash FROM users_passwordhashes WHERE user_id = ?').get(userId);
+  const row = db.prepare('SELECT password_hash FROM passwordhashes WHERE user_id = ?').get(userId);
   return !!row;
 }
 
 async function setPassword(userId, passwordHash) {
     const hash = await bcrypt.hash(passwordHash, 10);
-    db.prepare('INSERT OR REPLACE INTO users_passwordhashes (user_id, password_hash) VALUES (?, ?)').run(userId, hash);
+    db.prepare('INSERT OR REPLACE INTO passwordhashes (user_id, password_hash) VALUES (?, ?)').run(userId, hash);
 }
 
 async function comparePassword(userId, password) {
-  const row = db.prepare('SELECT password_hash FROM users_passwordhashes WHERE user_id = ?').get(userId);
+  const row = db.prepare('SELECT password_hash FROM passwordhashes WHERE user_id = ?').get(userId);
   if (!row) return false;
   return await bcrypt.compare(password, row.password_hash);
 }
 
-function clearUsers() {
-  db.prepare('DELETE FROM users').run();
+function clearAllPasswords() {
+  db.prepare('DELETE FROM passwordhashes').run();
 }
 
-module.exports = { initDatabase, getUsers, addUser, hasPassword, setPassword, comparePassword, clearUsers };
+function addArrival(userId, supervisorId = null, arrivalTime = null) {
+  // supervisor id can be null
+  if (!arrivalTime) {
+    arrivalTime = new Date().toISOString(); // Set to current time if not provided
+  }
+  db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, ?)').run(userId, arrivalTime, supervisorId);
+}
+
+function getArrivals(userId) {
+  return db.prepare('SELECT * FROM arrivalTimes WHERE user_id = ?').all(userId);
+}
+
+module.exports = { initDatabase, getUsers, addUser, clearUsers, hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivals };

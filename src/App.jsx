@@ -34,6 +34,7 @@ function App() {
       </div>
   <NameList people={users} addPerson={addUser} />
   <button onClick={clearUsers}>Clear users</button>
+  <button onClick={window.api.clearAllPasswords}>Clear all passwords</button>
   <Login />
     </div>
   );

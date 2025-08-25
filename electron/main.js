@@ -24,6 +24,10 @@ app.whenReady().then(() => {
 // IPC handlers
 ipcMain.handle('get-users', () => db.getUsers());
 ipcMain.handle('add-user', (event, user) => db.addUser(user));
-ipcMain.handle('get-password-hash', (event, userId) => db.getPasswordHash(userId));
-ipcMain.handle('set-password-hash', (event, userId, passwordHash) => db.setPasswordHash(userId, passwordHash));
 ipcMain.handle('clear-users', () => db.clearUsers());
+ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));
+ipcMain.handle('set-password', (event, userId, password) => db.setPassword(userId, password));
+ipcMain.handle('compare-password', (event, userId, password) => db.comparePassword(userId, password));
+ipcMain.handle('clear-all-passwords', () => db.clearAllPasswords());
+ipcMain.handle('add-arrival', (event, userId, arrivalTime) => db.addArrival(userId, arrivalTime));
+ipcMain.handle('get-arrivals', (event, userId) => db.getArrivals(userId));

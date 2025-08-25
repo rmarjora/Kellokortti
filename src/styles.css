@@ -70,3 +70,35 @@
 button {
   padding: 0.5rem 0.75rem;
 }
+
+/* Horizontal button group */
+.button-group {
+  display: inline-flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.button-group > button {
+  border: none;
+  background: #fff;
+  padding: 0.5rem 0.9rem;
+}
+
+.button-group > button + button {
+  border-left: 1px solid #e0e0e0;
+}
+
+.button-group > button:hover {
+  background: #f7f7f7;
+}
+
+.clocking-message {
+  margin-top: 0.5rem;
+  color: #0a7a0a;
+}
+
+.clocking-error {
+  margin-top: 0.5rem;
+  color: #b00020;
+}
