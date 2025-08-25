@@ -8,14 +8,21 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
     setMessage("");
     setError("");
     try {
-      if (!person?.id) throw new Error("No person selected");
-      await window.api.addArrival(person.id);
+      const success = await window.api.addArrival(person.id);
+      if (success) {
       setMessage(`Kellotettu ajassa ${new Date().toLocaleTimeString()}`);
+      } else {
+      setError("Olet jo kellottanut tänään");
+      }
     } catch (e) {
-      console.error("Clock in failed:", e);
+      console.error("addArrival failed", e);
       setError("Kellotus epäonnistui");
     }
   };
+
+  const handleLateArrival = () => {
+
+  }
 
   return (
     <>

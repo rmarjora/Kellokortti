@@ -64,12 +64,21 @@ function clearAllPasswords() {
   db.prepare('DELETE FROM passwordhashes').run();
 }
 
-function addArrival(userId, supervisorId = null, arrivalTime = null) {
-  // supervisor id can be null
-  if (!arrivalTime) {
-    arrivalTime = new Date().toISOString(); // Set to current time if not provided
-  }
-  db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, ?)').run(userId, arrivalTime, supervisorId);
+function addArrival(userId, arrivalTime = null) {
+  const nowIso = new Date().toISOString();
+  const when = arrivalTime || nowIso; // ISO timestamp
+
+  // Prevent multiple arrivals for the same local calendar day
+  const existingArrival = db
+    .prepare(
+      "SELECT 1 FROM arrivalTimes WHERE user_id = ? AND date(arrival_time, 'localtime') = date(?, 'localtime')"
+    )
+    .get(userId, when);
+  if (existingArrival) return false;
+
+  db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, NULL)')
+    .run(userId, when);
+  return true;
 }
 
 function getArrivals(userId) {
