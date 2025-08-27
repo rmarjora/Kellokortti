@@ -23,6 +23,8 @@ app.whenReady().then(() => {
 
 // IPC handlers
 ipcMain.handle('get-users', () => db.getUsers());
+ipcMain.handle('get-students', () => db.getStudents());
+ipcMain.handle('get-supervisors', () => db.getSupervisors());
 ipcMain.handle('add-user', (event, user) => db.addUser(user));
 ipcMain.handle('clear-users', () => db.clearUsers());
 ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));
@@ -30,4 +32,9 @@ ipcMain.handle('set-password', (event, userId, password) => db.setPassword(userI
 ipcMain.handle('compare-password', (event, userId, password) => db.comparePassword(userId, password));
 ipcMain.handle('clear-all-passwords', () => db.clearAllPasswords());
 ipcMain.handle('add-arrival', (event, userId, arrivalTime) => db.addArrival(userId, arrivalTime));
+ipcMain.handle('get-arrival-today', (event, userId) => db.getArrivalToday(userId));
 ipcMain.handle('get-arrivals', (event, userId) => db.getArrivals(userId));
+ipcMain.handle('set-arrival-supervisor', (event, arrivalId, supervisorId) => db.setArrivalSupervisor(arrivalId, supervisorId));
+ipcMain.handle('get-arrival-supervisor', (event, arrivalId) => db.getArrivalSupervisor(arrivalId));
+ipcMain.handle('append-supervisor', (event, arrivalId, supervisorId) => db.appendSupervisor(arrivalId, supervisorId));
+ipcMain.handle('clear-all-arrivals', () => db.clearAllArrivals());

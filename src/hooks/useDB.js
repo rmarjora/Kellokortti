@@ -2,42 +2,41 @@
 import { useState, useEffect } from "react";
 
 const useDB = () => {
-  const [users, setUsers] = useState([]);
-
+  const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchStudents = async () => {
       try {
-        const users = await window.api.getUsers();
-        setUsers(users);
+        const students = await window.api.getStudents();
+        setStudents(students);
       } catch (error) {
-        console.error('Failed to fetch users:', error);
+        console.error('Failed to fetch students:', error);
       }
     };
-    fetchUsers();
+    fetchStudents();
   }, []);
 
 
-  const addUser = async (user) => {
+  const addStudent = async (student) => {
     try {
-      const newUser = await window.api.addUser(user);
-      setUsers(prev => [...prev, newUser]);
+      const newStudent = await window.api.addStudent(student);
+      setStudents(prev => [...prev, newStudent]);
     } catch (error) {
-      console.error('Failed to add user:', error);
+      console.error('Failed to add student:', error);
     }
   };
 
 
-  const clearUsers = async () => {
+  const clearStudents = async () => {
     try {
-      await window.api.clearUsers();
-      setUsers([]);
+      await window.api.clearStudents();
+      setStudents([]);
     } catch (error) {
-      console.error('Failed to clear users:', error);
+      console.error('Failed to clear students:', error);
     }
   };
 
-  return { users, addUser, clearUsers };
+  return { students, addStudent, clearStudents };
 };
 
 export default useDB;

@@ -10,7 +10,7 @@ const NameList = ({ people }) => {
     return <div>No people yet...</div>;
   }
 
-    const [selectedPerson, setSelectedPerson] = useState(null);
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showClocking, setShowClocking] = useState(false);
 

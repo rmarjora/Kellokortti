@@ -17,7 +17,7 @@ const Popup = ({ open, onClose, children }) => {
       <div className="popup-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         {children}
         <div className="popup-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>Kirjaudu ulos</button>
         </div>
       </div>
     </div>,

@@ -29,9 +29,16 @@ function initDatabase() {
   )`)
 }
 
-
 function getUsers() {
   return db.prepare('SELECT * FROM users').all();
+}
+
+function getStudents() {
+  return db.prepare("SELECT * FROM users WHERE role = 'student'").all();
+}
+
+function getSupervisors() {
+  return db.prepare("SELECT * FROM users WHERE role = 'supervisor'").all();
 }
 
 function addUser(user) {
@@ -64,25 +71,53 @@ function clearAllPasswords() {
   db.prepare('DELETE FROM passwordhashes').run();
 }
 
+function getArrivalToday(userId) {
+  const currentTime = new Date().toISOString();
+  const row = db
+    .prepare("SELECT arrival_id AS id, arrival_time, supervisor_id FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time) = DATE(?) ORDER BY arrival_time ASC LIMIT 1")
+    .get(userId, currentTime);
+  return row ? { id: row.id, arrivalTime: row.arrival_time, supervisorId: row.supervisor_id } : null;
+}
+
 function addArrival(userId, arrivalTime = null) {
-  const nowIso = new Date().toISOString();
-  const when = arrivalTime || nowIso; // ISO timestamp
+  const currentTime = new Date().toISOString();
+  arrivalTime = arrivalTime || currentTime; // ISO timestamp
 
   // Prevent multiple arrivals for the same local calendar day
   const existingArrival = db
     .prepare(
-      "SELECT 1 FROM arrivalTimes WHERE user_id = ? AND date(arrival_time, 'localtime') = date(?, 'localtime')"
+      "SELECT (arrival_time) FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time) = DATE(?)"
     )
-    .get(userId, when);
-  if (existingArrival) return false;
+    .get(userId, currentTime);
+
+  console.log("Existing arrival:", existingArrival);
+  if (existingArrival) return null;
 
   db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, NULL)')
-    .run(userId, when);
-  return true;
+    .run(userId, arrivalTime);
+  return { id: db.lastInsertRowid, arrivalTime };
+}
+
+function getArrivalSupervisor(arrivalId) {
+  const row = db.prepare('SELECT supervisor_id FROM arrivalTimes WHERE arrival_id = ?').get(arrivalId);
+  if (!row || row.supervisor_id == null) return null;
+  return db.prepare('SELECT * FROM users WHERE id = ?').get(row.supervisor_id);
 }
 
 function getArrivals(userId) {
   return db.prepare('SELECT * FROM arrivalTimes WHERE user_id = ?').all(userId);
 }
 
-module.exports = { initDatabase, getUsers, addUser, clearUsers, hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivals };
+function clearAllArrivals() {
+  db.prepare('DELETE FROM arrivalTimes').run();
+}
+
+function setArrivalSupervisor(arrivalId, supervisorId) {
+  const stmt = db.prepare(
+    'UPDATE arrivalTimes SET supervisor_id = ? WHERE arrival_id = ?'
+  );
+  const info = stmt.run(supervisorId, arrivalId);
+  return info.changes > 0;
+}
+
+module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, clearUsers, hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor };

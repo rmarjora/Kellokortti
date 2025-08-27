@@ -4,14 +4,14 @@ import NameList from './components/NameList';
 import Login from './components/Login';
 
 function App() {
-  const { users, addUser, clearUsers } = useDB();
+  const { students, addStudent, clearStudents } = useDB();
   const [nameInput, setNameInput] = useState('');
 
-  console.log('Users:', users);
+  console.log('Students:', students);
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Users</h1>
+      <h1>Students</h1>
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
         <input
           type="text"
@@ -24,17 +24,18 @@ function App() {
           onClick={() => {
             const name = nameInput.trim();
             if (!name) return;
-            addUser({ name });
+            addStudent({ name });
             setNameInput('');
           }}
           disabled={!nameInput.trim()}
         >
-          Add User
+          Add Student
         </button>
       </div>
-  <NameList people={users} addPerson={addUser} />
-  <button onClick={clearUsers}>Clear users</button>
+  <NameList people={students} />
+  <button onClick={clearStudents}>Clear students</button>
   <button onClick={window.api.clearAllPasswords}>Clear all passwords</button>
+  <button onClick={window.api.clearAllArrivals}>Clear all arrivals</button>
   <Login />
     </div>
   );
