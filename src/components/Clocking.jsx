@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { WORK_START_TIME } from "../config.js";
+import { WORK_START_TIME, ALLOWED_LATE_MINUTES } from "../config.js";
 
 const Clocking = ({ person, onBreak, onClockOut }) => {
   const [message, setMessage] = useState("");
@@ -16,15 +16,22 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
     fetchArrival();
   }, []);
 
-  const isLate = () => {
-    if (!arrival?.arrivalTime) return false;
+  // Compute minutes late and pick a color class for the time display
+  const getLateMinutes = () => {
+    if (!arrival?.arrivalTime) return 0;
     const arrivalDate = new Date(arrival.arrivalTime);
-
-    if (arrivalDate.getHours() > WORK_START_TIME.hour) return true;
-    if (arrivalDate.getHours() === WORK_START_TIME.hour && arrivalDate.getMinutes() > WORK_START_TIME.minute) return true;
-
-    return false;
+    const start = new Date(arrivalDate);
+    start.setHours(WORK_START_TIME.hour, WORK_START_TIME.minute, 0, 0);
+    const diffMin = Math.round((arrivalDate.getTime() - start.getTime()) / 60000);
+    return diffMin;
   };
+
+  const lateMinutes = getLateMinutes();
+  const timeClass = lateMinutes <= 0
+    ? 'time-green'
+    : lateMinutes <= ALLOWED_LATE_MINUTES
+      ? 'time-yellow'
+      : 'time-red';
 
   const handleLateArrival = async () => {
     try {
@@ -74,12 +81,18 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
   if (arrival === undefined) {
     return <h2>Loading…</h2>;
   }
+  
+  if (arrival === null) {
+    return <button onClick={handleClockIn}>Kellota saapuminen</button>;
+  }
 
-  if (!isLate()) {
+  if (lateMinutes <= ALLOWED_LATE_MINUTES) {
     return (
       <div>
         <p>Ajoissa</p>
-        <p>Kellotettu ajassa {new Date(arrival.arrivalTime).toLocaleTimeString()}</p>
+        <p>
+          Kellotettu ajassa <span className={timeClass}>{new Date(arrival.arrivalTime).toLocaleTimeString()}</span>
+        </p>
         <p className="clocking-message" role="status">{message}</p>
       </div>
     )
@@ -87,7 +100,9 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
     return (
       <div>
         <p>Myöhässä</p>
-        <p>Kellotettu ajassa {new Date(arrival.arrivalTime).toLocaleTimeString()}</p>
+        <p>
+          Kellotettu ajassa <span className={timeClass}>{new Date(arrival.arrivalTime).toLocaleTimeString()}</span>
+        </p>
         <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>
         {showSupervisorPicker && (
         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -107,10 +122,11 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
               ))}
             </select>
           </label>
+
           <button type="button" onClick={confirmSupervisor}>Tallenna</button>
         </div>
       )}
-      {!showSupervisorPicker && arrival.supervisorId != null && <p>Lupa lisätty</p>}
+      {!showSupervisorPicker && arrival.supervisorId != null && <p className="clocking-message">Lupa lisätty</p>}
     </div>
   );
 }
