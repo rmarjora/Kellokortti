@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   getUsers: () => ipcRenderer.invoke('get-users'),
+  getUser: (userId) => ipcRenderer.invoke('get-user', userId),
   getStudents: () => ipcRenderer.invoke('get-students'),
   getSupervisors: () => ipcRenderer.invoke('get-supervisors'),
   addUser: (user) => ipcRenderer.invoke('add-user', user),
@@ -15,5 +16,14 @@ contextBridge.exposeInMainWorld('api', {
   getArrivals: (userId) => ipcRenderer.invoke('get-arrivals', userId),
   getArrivalSupervisor: (arrivalId) => ipcRenderer.invoke('get-arrival-supervisor', arrivalId),
   setArrivalSupervisor: (arrivalId, supervisorId) => ipcRenderer.invoke('set-arrival-supervisor', arrivalId, supervisorId),
-  clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals')
+  clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals'),
+  getTodaysArrivals: () => ipcRenderer.invoke('get-todays-arrivals'),
+  // Settings
+  getSetting: (key) => ipcRenderer.invoke('get-setting', key),
+  setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value)
+});
+
+// Synchronous API exposed separately to avoid mixing with Promise-based API
+contextBridge.exposeInMainWorld('apiSync', {
+  getSetting: (key) => ipcRenderer.sendSync('get-setting-sync', key)
 });

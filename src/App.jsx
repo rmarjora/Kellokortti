@@ -1,42 +1,51 @@
 import { useState } from 'react';
 import useDB from './hooks/useDB';
 import NameList from './components/NameList';
-import Login from './components/Login';
+import SupervisorLogin from './components/SupervisorLogin';
+import Contact from './components/Contact';
+import Settings from './components/Settings';
+import useField from './hooks/useField';
 
 function App() {
   const { students, addStudent, clearStudents } = useDB();
-  const [nameInput, setNameInput] = useState('');
+  const name = useField()
+  const [supervisor, setSupervisor] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   console.log('Students:', students);
 
+  const handleAddStudent = () => {
+    const studentName = name.value.trim();
+    if (studentName) {
+      addStudent({ name: studentName });
+      name.setValue('');
+    }
+  };
+
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Students</h1>
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-        <input
-          type="text"
-          placeholder="Enter name"
-          value={nameInput}
-          onChange={(e) => setNameInput(e.target.value)}
-          style={{ padding: '0.5rem', flex: '0 0 200px' }}
-        />
-        <button
-          onClick={() => {
-            const name = nameInput.trim();
-            if (!name) return;
-            addStudent({ name });
-            setNameInput('');
-          }}
-          disabled={!nameInput.trim()}
-        >
-          Add Student
-        </button>
+    <div className="app">
+      <div className="floating-blob blob-1" />
+      <div className="floating-blob blob-2" />
+      <h1>Kellokortti - Digitalents Academy</h1>
+      <h2>Tervetuloa pajalle!</h2>
+      <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
+        
       </div>
-  <NameList people={students} />
-  <button onClick={clearStudents}>Clear students</button>
-  <button onClick={window.api.clearAllPasswords}>Clear all passwords</button>
-  <button onClick={window.api.clearAllArrivals}>Clear all arrivals</button>
-  <Login />
+  <NameList people={students} supervised={!!supervisor || isAdmin} />
+  {isAdmin && 
+  <div>
+    <h3>Admin Panel</h3>
+    <input type="text" onChange={name.onChange} value={name.value}/>
+    <button onClick={handleAddStudent}>Lisää henkilö</button>
+  </div>}
+  <SupervisorLogin onLogin={setSupervisor} onLogout={() => setSupervisor(null)} />
+    <button onClick={() => setIsAdmin(!isAdmin)}>
+      {isAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
+    </button>
+  <footer>
+    <Contact />
+  </footer>
+  <Settings />
     </div>
   );
 }

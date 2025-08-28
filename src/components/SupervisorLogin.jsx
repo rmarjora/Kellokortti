@@ -1,12 +1,17 @@
 import useField from "../hooks/useField"
 
-const Login = () => {
+const SupervisorLogin = ({ onLogin, onLogout }) => {
   const username = useField()
   const password = useField()
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    // Handle login logic here
+    const isValid = await window.api.comparePassword(username.value, password.value)
+    if (isValid) {
+      onLogin(username.value)
+    } else {
+      alert("Invalid credentials")
+    }
   }
 
   return (
@@ -28,4 +33,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default SupervisorLogin

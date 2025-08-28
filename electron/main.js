@@ -23,6 +23,7 @@ app.whenReady().then(() => {
 
 // IPC handlers
 ipcMain.handle('get-users', () => db.getUsers());
+ipcMain.handle('get-user', (event, userId) => db.getUser(userId));
 ipcMain.handle('get-students', () => db.getStudents());
 ipcMain.handle('get-supervisors', () => db.getSupervisors());
 ipcMain.handle('add-user', (event, user) => db.addUser(user));
@@ -38,3 +39,16 @@ ipcMain.handle('set-arrival-supervisor', (event, arrivalId, supervisorId) => db.
 ipcMain.handle('get-arrival-supervisor', (event, arrivalId) => db.getArrivalSupervisor(arrivalId));
 ipcMain.handle('append-supervisor', (event, arrivalId, supervisorId) => db.appendSupervisor(arrivalId, supervisorId));
 ipcMain.handle('clear-all-arrivals', () => db.clearAllArrivals());
+ipcMain.handle('get-todays-arrivals', () => db.getTodaysArrivals());
+// Settings handlers
+ipcMain.handle('get-setting', (event, key) => db.getSetting(key));
+ipcMain.handle('set-setting', (event, key, value) => db.setSetting(key, value));
+ipcMain.on('get-setting-sync', (event, key) => {
+  try {
+    const value = db.getSetting(key);
+    event.returnValue = value;
+  } catch (e) {
+    console.error('get-setting-sync failed', e);
+    event.returnValue = null;
+  }
+});

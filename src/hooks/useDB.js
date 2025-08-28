@@ -19,8 +19,8 @@ const useDB = () => {
 
   const addStudent = async (student) => {
     try {
-      const newStudent = await window.api.addStudent(student);
-      setStudents(prev => [...prev, newStudent]);
+      const newUser = await window.api.addUser(student);
+      setStudents(prev => [...prev, newUser]);
     } catch (error) {
       console.error('Failed to add student:', error);
     }

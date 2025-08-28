@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const Popup = ({ open, onClose, children }) => {
+const Popup = ({ open, onClose, exitText, children }) => {
   if (!open) return null;
 
   useEffect(() => {
@@ -15,9 +15,11 @@ const Popup = ({ open, onClose, children }) => {
   return createPortal(
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-        {children}
+        <div className="popup-content">
+          {children}
+        </div>
         <div className="popup-actions">
-          <button type="button" onClick={onClose}>Kirjaudu ulos</button>
+          <button type="button" onClick={onClose}>{exitText}</button>
         </div>
       </div>
     </div>,

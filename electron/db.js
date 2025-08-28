@@ -27,10 +27,24 @@ function initDatabase() {
     supervisor_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value INTEGER NOT NULL
+  )`)
+  // Initialize default settings
+  db.exec(`INSERT OR IGNORE INTO settings (key, value) VALUES
+    ('work_start_time_hour', 9),
+    ('work_start_time_minute', 0),
+    ('allowed_late_minutes', 15)
+  `)
 }
 
 function getUsers() {
   return db.prepare('SELECT * FROM users').all();
+}
+
+function getUser(userId) {
+  return db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 }
 
 function getStudents() {
@@ -45,6 +59,15 @@ function addUser(user) {
   const role = user.role ?? 'student';
   const info = db.prepare('INSERT INTO users (name, role) VALUES (?, ?)').run([user.name, role]);
   return { id: info.lastInsertRowid, ...user };
+}
+
+function getSetting(key) {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key);
+  return row ? row.value : null;
+}
+
+function setSetting(key, value) {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run([key, value]);
 }
 
 function clearUsers() {
@@ -105,7 +128,11 @@ function getArrivalSupervisor(arrivalId) {
 }
 
 function getArrivals(userId) {
-  return db.prepare('SELECT * FROM arrivalTimes WHERE user_id = ?').all(userId);
+  return db.prepare('SELECT * FROM arrivalTimes WHERE user_id = ?').all(userId).map(row => ({
+    id: row.arrival_id,
+    arrivalTime: row.arrival_time,
+    supervisorId: row.supervisor_id
+  }));
 }
 
 function clearAllArrivals() {
@@ -120,4 +147,17 @@ function setArrivalSupervisor(arrivalId, supervisorId) {
   return info.changes > 0;
 }
 
-module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, clearUsers, hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor };
+function getTodaysArrivals() {
+  const currentTime = new Date().toISOString();
+  return db
+    .prepare("SELECT * FROM arrivalTimes WHERE DATE(arrival_time) = DATE(?)")
+    .all(currentTime).map(row => ({
+      id: row.arrival_id,
+      userId: row.user_id,
+      arrivalTime: row.arrival_time,
+      supervisorId: row.supervisor_id
+    }));
+}
+
+module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, clearUsers, setSetting, getSetting,
+  hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals };

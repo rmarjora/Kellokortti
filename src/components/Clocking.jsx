@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { WORK_START_TIME, ALLOWED_LATE_MINUTES } from "../config.js";
+import { getAllowedLateMinutes } from "../config.js";
+import { getLateMinutes } from '../utils.js';
 
-const Clocking = ({ person, onBreak, onClockOut }) => {
+const Clocking = ({ person, onClocked, supervised }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [arrival, setArrival] = useState(undefined);
   const [showSupervisorPicker, setShowSupervisorPicker] = useState(false);
   const [supervisors, setSupervisors] = useState([]);
+  const allowedLateMinutes = getAllowedLateMinutes();
 
   useEffect(() => {
     const fetchArrival = async () => {
@@ -14,24 +16,16 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
       setArrival(a);
     };
     fetchArrival();
-  }, []);
+  }, [person?.id]);
 
-  // Compute minutes late and pick a color class for the time display
-  const getLateMinutes = () => {
-    if (!arrival?.arrivalTime) return 0;
-    const arrivalDate = new Date(arrival.arrivalTime);
-    const start = new Date(arrivalDate);
-    start.setHours(WORK_START_TIME.hour, WORK_START_TIME.minute, 0, 0);
-    const diffMin = Math.round((arrivalDate.getTime() - start.getTime()) / 60000);
-    return diffMin;
-  };
-
-  const lateMinutes = getLateMinutes();
+  const lateMinutes = getLateMinutes(arrival?.arrivalTime);
   const timeClass = lateMinutes <= 0
     ? 'time-green'
-    : lateMinutes <= ALLOWED_LATE_MINUTES
+    : lateMinutes <= allowedLateMinutes
       ? 'time-yellow'
       : 'time-red';
+
+  console.log('Late minutes:', lateMinutes);
 
   const handleLateArrival = async () => {
     try {
@@ -75,18 +69,20 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
     setError("");
     const currentTime = new Date().toISOString();
     console.log("Clocking in at:", currentTime);
-  setArrival(await window.api.addArrival(person.id, currentTime));
+    const newArrival = await window.api.addArrival(person.id, currentTime);
+    setArrival(newArrival);
+    onClocked(newArrival)
   };
 
   if (arrival === undefined) {
     return <h2>Loading…</h2>;
   }
-  
-  if (arrival === null) {
+
+  if (arrival === null && !supervised) {
     return <button onClick={handleClockIn}>Kellota saapuminen</button>;
   }
 
-  if (lateMinutes <= ALLOWED_LATE_MINUTES) {
+  if (lateMinutes <= allowedLateMinutes) {
     return (
       <div>
         <p>Ajoissa</p>
@@ -103,7 +99,7 @@ const Clocking = ({ person, onBreak, onClockOut }) => {
         <p>
           Kellotettu ajassa <span className={timeClass}>{new Date(arrival.arrivalTime).toLocaleTimeString()}</span>
         </p>
-        <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>
+        {!showSupervisorPicker && !supervised && <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>}
         {showSupervisorPicker && (
         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <label>

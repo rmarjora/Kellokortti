@@ -14,9 +14,9 @@ const style = {
   },
 };
 
-const ClickableName = ({ name, onClick }) => {
+const ClickableName = ({ name, onClick, hasArrived }) => {
   return (
-    <div className="clickable-name" style={style.box} onClick={onClick}>
+    <div className="clickable-name" style={{ ...style.box, backgroundColor: hasArrived ? '#e0ffe0' : '#fff' }} onClick={onClick}>
       {name}
     </div>
   );
