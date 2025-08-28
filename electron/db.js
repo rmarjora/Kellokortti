@@ -61,6 +61,12 @@ function addUser(user) {
   return { id: info.lastInsertRowid, ...user };
 }
 
+function deleteUser(userId) {
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+  db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM arrivalTimes WHERE user_id = ?').run(userId);
+}
+
 function getSetting(key) {
   const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key);
   return row ? row.value : null;
@@ -159,5 +165,5 @@ function getTodaysArrivals() {
     }));
 }
 
-module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, clearUsers, setSetting, getSetting,
+module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, deleteUser, clearUsers, setSetting, getSetting,
   hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals };

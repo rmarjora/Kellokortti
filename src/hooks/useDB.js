@@ -26,6 +26,15 @@ const useDB = () => {
     }
   };
 
+  const deleteStudent = async (userId) => {
+    try {
+      await window.api.deleteUser(userId);
+      setStudents(prev => prev.filter(s => s.id !== userId));
+    } catch (error) {
+      console.error('Failed to delete student:', error);
+    }
+  }
+
 
   const clearStudents = async () => {
     try {
@@ -36,7 +45,7 @@ const useDB = () => {
     }
   };
 
-  return { students, addStudent, clearStudents };
+  return { students, addStudent, deleteStudent, clearStudents };
 };
 
 export default useDB;

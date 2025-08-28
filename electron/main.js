@@ -27,6 +27,7 @@ ipcMain.handle('get-user', (event, userId) => db.getUser(userId));
 ipcMain.handle('get-students', () => db.getStudents());
 ipcMain.handle('get-supervisors', () => db.getSupervisors());
 ipcMain.handle('add-user', (event, user) => db.addUser(user));
+ipcMain.handle('delete-user', (event, userId) => db.deleteUser(userId));
 ipcMain.handle('clear-users', () => db.clearUsers());
 ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));
 ipcMain.handle('set-password', (event, userId, password) => db.setPassword(userId, password));

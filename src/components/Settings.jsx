@@ -56,7 +56,6 @@ const Settings = () => {
         <button type="button" onClick={save} disabled={saving}>Tallenna</button>
         {msg && <span className="badge">{msg}</span>}
       </div>
-      <p style={{ marginTop: '0.5rem', color: 'var(--muted)' }}>Muutokset vaikuttavat uusiin näkymiin; päivitä näkymä tarvittaessa.</p>
     </div>
   );
 };

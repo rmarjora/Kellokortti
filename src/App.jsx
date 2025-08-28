@@ -3,14 +3,16 @@ import useDB from './hooks/useDB';
 import NameList from './components/NameList';
 import SupervisorLogin from './components/SupervisorLogin';
 import Contact from './components/Contact';
-import Settings from './components/Settings';
 import useField from './hooks/useField';
+import Settings from './components/Settings';
+import Popup from './components/Popup';
 
 function App() {
   const { students, addStudent, clearStudents } = useDB();
   const name = useField()
   const [supervisor, setSupervisor] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   console.log('Students:', students);
 
@@ -37,6 +39,8 @@ function App() {
     <h3>Admin Panel</h3>
     <input type="text" onChange={name.onChange} value={name.value}/>
     <button onClick={handleAddStudent}>Lisää henkilö</button>
+    <button onClick={() => setShowSettings(true)}>Asetukset</button>
+    <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
   </div>}
   <SupervisorLogin onLogin={setSupervisor} onLogout={() => setSupervisor(null)} />
     <button onClick={() => setIsAdmin(!isAdmin)}>
@@ -45,7 +49,6 @@ function App() {
   <footer>
     <Contact />
   </footer>
-  <Settings />
     </div>
   );
 }

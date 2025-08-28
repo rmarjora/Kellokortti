@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('api', {
   getStudents: () => ipcRenderer.invoke('get-students'),
   getSupervisors: () => ipcRenderer.invoke('get-supervisors'),
   addUser: (user) => ipcRenderer.invoke('add-user', user),
+  deleteUser: (userId) => ipcRenderer.invoke('delete-user', userId),
   clearUsers: () => ipcRenderer.invoke('clear-users'),
   hasPassword: (userId) => ipcRenderer.invoke('has-password', userId),
   setPassword: (userId, password) => ipcRenderer.invoke('set-password', userId, password),
