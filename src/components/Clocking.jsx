@@ -82,6 +82,10 @@ const Clocking = ({ person, onClocked, supervised }) => {
     return <button onClick={handleClockIn}>Kellota saapuminen</button>;
   }
 
+  if (arrival === null) {
+    return <p>Ei ole kellottanut vielä</p>
+  }
+
   if (lateMinutes <= allowedLateMinutes) {
     return (
       <div>
