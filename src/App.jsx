@@ -30,13 +30,8 @@ function App() {
 
   return (
     <div className="app">
-      <div className="floating-blob blob-1" />
-      <div className="floating-blob blob-2" />
       <h1>Kellokortti - Digitalents Academy</h1>
       <h2>Tervetuloa pajalle!</h2>
-      <div className="card" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-        
-      </div>
   <NameList people={students} supervised={!!supervisor || isAdmin} />
   {isAdmin && 
   <div>

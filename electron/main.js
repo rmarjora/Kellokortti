@@ -8,12 +8,19 @@ function createWindow() {
     height: 600,
     webPreferences: {
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(app.getAppPath(), 'electron/preload.js')
     }
   });
 
-  const devServerURL = process.env.VITE_DEV_SERVER_URL;
-  win.loadURL(devServerURL || `file://${path.join(__dirname, '../dist/index.html')}`);
+  if (process.env.VITE_DEV_SERVER_URL) {
+    // Dev mode
+    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+    win.webContents.openDevTools();
+  } else {
+    // Production mode (inside ASAR)
+    const indexPath = path.join(app.getAppPath(), 'dist/index.html');
+    win.loadFile(indexPath);
+  }
 }
 
 app.whenReady().then(() => {
