@@ -83,7 +83,7 @@ const Clocking = ({ person, onClocked, supervised }) => {
   }
 
   if (arrival === null) {
-    return <p>Ei ole kellottanut vielä</p>
+    return <p>Ei ole saapunut tänään</p>
   }
 
   if (lateMinutes <= allowedLateMinutes) {

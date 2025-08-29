@@ -8,14 +8,17 @@
     "dev": "concurrently \"npm run react-dev\" \"npm run electron-dev\"",
     "build": "vite build",
     "start": "electron .",
-    "build:electron": "electron-builder"
+    "build:electron": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.2.0",
     "electron-store": "^10.1.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",

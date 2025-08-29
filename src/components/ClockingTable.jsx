@@ -74,7 +74,7 @@ const ClockingTable = ({ user }) => {
       <div>
         <h3>Yhteenveto</h3>
         <p>Kellotuksia yhteensä: {arrivals.length}</p>
-        <p>{averageLateMinutes > 0 ? `Myöhässä keskimäärin: ${averageLateMinutes} minuuttia` : `Ajoissa keskimäärin: ${-averageLateMinutes} minuuttia`}</p>
+        <p>{averageLateMinutes >= 0 ? `Myöhässä keskimäärin: ${averageLateMinutes} minuuttia` : `Keskimäärin ${-averageLateMinutes} minuuttia liian ajoissa`}</p>
         <p>Luvattomia yli {allowedLateMinutes} min myöhästymisiä: {unauthorizedArrivals.filter(arrival => getLateMinutes(arrival.arrivalTime) > allowedLateMinutes).length}</p>
       </div>
     </div>

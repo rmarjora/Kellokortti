@@ -63,7 +63,7 @@ const NameList = ({ people, supervised }) => {
             onClocked={refetchArrivals}
             supervised={supervised}
           />
-          <Options user={selectedPerson} />
+          <Options user={selectedPerson} supervised={supervised} onDeleted={handleCancel} />
         </Popup>
       </div>
     );

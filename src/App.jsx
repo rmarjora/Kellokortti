@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import useDB from './hooks/useDB';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStudents, addStudentAsync, clearStudentsAsync } from './store/studentsSlice';
 import NameList from './components/NameList';
 import SupervisorLogin from './components/SupervisorLogin';
 import Contact from './components/Contact';
@@ -8,18 +9,21 @@ import Settings from './components/Settings';
 import Popup from './components/Popup';
 
 function App() {
-  const { students, addStudent, clearStudents } = useDB();
+  const dispatch = useDispatch();
+  const students = useSelector(state => state.students.items);
   const name = useField()
   const [supervisor, setSupervisor] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  console.log('Students:', students);
+  useEffect(() => {
+    dispatch(fetchStudents());
+  }, [dispatch]);
 
   const handleAddStudent = () => {
     const studentName = name.value.trim();
     if (studentName) {
-      addStudent({ name: studentName });
+  dispatch(addStudentAsync({ name: studentName }));
       name.setValue('');
     }
   };
@@ -43,6 +47,9 @@ function App() {
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
   </div>}
   <SupervisorLogin onLogin={setSupervisor} onLogout={() => setSupervisor(null)} />
+    {isAdmin && (
+      <button onClick={() => dispatch(clearStudentsAsync())}>Tyhjennä opiskelijat</button>
+    )}
     <button onClick={() => setIsAdmin(!isAdmin)}>
       {isAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
     </button>

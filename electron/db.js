@@ -62,9 +62,15 @@ function addUser(user) {
 }
 
 function deleteUser(userId) {
-  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
-  db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
-  db.prepare('DELETE FROM arrivalTimes WHERE user_id = ?').run(userId);
+  try {
+    db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
+    db.prepare('DELETE FROM arrivalTimes WHERE user_id = ?').run(userId);
+    const info = db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+    return info.changes > 0;
+  } catch (e) {
+    console.error('deleteUser failed', e);
+    return false;
+  }
 }
 
 function getSetting(key) {
