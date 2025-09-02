@@ -24,7 +24,8 @@ contextBridge.exposeInMainWorld('api', {
   clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals'),
   getTodaysArrivals: () => ipcRenderer.invoke('get-todays-arrivals'),
   getStaffList: () => ipcRenderer.invoke('get-staff-list'),
-  addStaff: (name, email, phone1, phone2) => ipcRenderer.invoke('add-staff', name, email, phone1, phone2),
+    getStaff: () => ipcRenderer.invoke('get-staff'),
+    addStaff: (staff) => ipcRenderer.invoke('add-staff', staff),
   // Settings
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
   setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value)

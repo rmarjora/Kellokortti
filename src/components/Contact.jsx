@@ -1,37 +1,12 @@
-import { useEffect, useState } from 'react';
-
-const Contact = () => {
-  const [staff, setStaff] = useState(null);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const list = await window.api.getStaffList();
-        if (mounted) setStaff(list);
-      } catch (e) {
-        console.error('Failed to load staff list', e);
-        if (mounted) setError('Yhteystietojen lataus epäonnistui');
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
-
-  const content = !staff? <div>Ladataan…</div> : staff.length === 0 ? <p>Henkilökuntaa ei ole</p> : (
-    <div>
-      {staff.map((line, i) => (
-        <div key={i}>{line}</div>
-      ))}
-    </div>
-  );
-
-  return (
-    <div>
-      <h2>Henkilökunnan yhteystiedot:</h2>
-      {content}
-    </div>
-  );
+const Contact = ({ staff }) => {
+	if (!staff) return null;
+	const { name, email, phone1, phone2 } = staff;
+	const parts = [];
+	if (email) parts.push(email);
+	const phones = [phone1, phone2].filter(Boolean).join(', ');
+	if (phones) parts.push(phones);
+	const line = `${name}: ${parts.join(' / ') || '-'}`;
+	return <div>{line}</div>;
 }
 
 export default Contact;

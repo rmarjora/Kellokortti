@@ -49,11 +49,11 @@ ipcMain.handle('get-arrival-today', (event, userId) => db.getArrivalToday(userId
 ipcMain.handle('get-arrivals', (event, userId) => db.getArrivals(userId));
 ipcMain.handle('set-arrival-supervisor', (event, arrivalId, supervisorId) => db.setArrivalSupervisor(arrivalId, supervisorId));
 ipcMain.handle('get-arrival-supervisor', (event, arrivalId) => db.getArrivalSupervisor(arrivalId));
-ipcMain.handle('append-supervisor', (event, arrivalId, supervisorId) => db.appendSupervisor(arrivalId, supervisorId));
 ipcMain.handle('clear-all-arrivals', () => db.clearAllArrivals());
 ipcMain.handle('get-todays-arrivals', () => db.getTodaysArrivals());
 ipcMain.handle('get-staff-list', () => db.getStaffList());
-ipcMain.handle('add-staff', (event, name, email, phone1, phone2) => db.addStaff(name, email, phone1, phone2));
+ipcMain.handle('get-staff', () => db.getStaff());
+ipcMain.handle('add-staff', (event, staff) => db.addStaff(staff));
 // Settings handlers
 ipcMain.handle('get-setting', (event, key) => db.getSetting(key));
 ipcMain.handle('set-setting', (event, key, value) => db.setSetting(key, value));

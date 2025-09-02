@@ -73,8 +73,15 @@ function getStaffList() {
   });
 }
 
-function addStaff(name, email, phone1, phone2) {
-  db.prepare('INSERT INTO staff (name, email, phone1, phone2) VALUES (?, ?, ?, ?)').run([name, email, phone1, phone2]);
+function getStaff() {
+  return db.prepare('SELECT id, name, email, phone1, phone2 FROM staff').all();
+}
+
+function addStaff(staff) {
+  const { name, email = null, phone1 = null, phone2 = null } = staff || {};
+  const stmt = db.prepare('INSERT INTO staff (name, email, phone1, phone2) VALUES (?, ?, ?, ?)');
+  const info = stmt.run(name, email, phone1, phone2);
+  return { id: info.lastInsertRowid, name, email, phone1, phone2 };
 }
 
 function adminPasswordExists() {
@@ -230,6 +237,14 @@ function getTodaysArrivals() {
     }));
 }
 
-module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, deleteUser, clearUsers, setSetting, getSetting,
-  hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor,
-  getTodaysArrivals, getStaffList, addStaff, setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword };
+module.exports = { 
+  initDatabase,
+  getUsers, getStudents, getSupervisors, addUser, deleteUser, clearUsers,
+  setSetting, getSetting,
+  hasPassword, setPassword, comparePassword, clearAllPasswords,
+  addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals,
+  // Staff
+  getStaffList, getStaff, addStaff,
+  // Admin password helpers
+  setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword
+};

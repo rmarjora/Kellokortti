@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudents, addStudentAsync, clearStudentsAsync } from './store/studentsSlice';
 import NameList from './components/NameList';
-import Contact from './components/Contact';
+import ContactList from './components/ContactList';
 import useField from './hooks/useField';
 import Settings from './components/Settings';
 import Popup from './components/Popup';
@@ -51,7 +51,7 @@ function App() {
       {isAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
     </button>
   <footer className="app-footer">
-    <Contact />
+    <ContactList />
   </footer>
     </div>
   );
