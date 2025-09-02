@@ -32,12 +32,12 @@ const Clocking = ({ person, onClocked, supervised }) => {
       setError("");
       setMessage("");
       if (!showSupervisorPicker) {
-        // Lazy-load supervisors when opening the picker
-        const list = await window.api.getSupervisors();
-        console.log("Fetched supervisors:", list);
-        list.push({ id: -2, name: "Krishna "}); // Example supervisors because we don't have real data
-        list.push({ id: -1, name: "Joku muu" });
-        console.log("Fetched supervisors:", list);
+        // Lazy-load staff when opening the picker
+  const list = await window.api.getStaff();
+  // Add dummy entries
+  // list.push({ id: -2, name: "Krishna "});
+  list.push({ id: -1, name: "Joku muu" });
+  console.log("Fetched staff:", list);
         setSupervisors(list);
         setShowSupervisorPicker(true);
       } else {
