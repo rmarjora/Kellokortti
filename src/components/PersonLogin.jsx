@@ -52,10 +52,10 @@ const PersonLogin = ({ person, onSuccess }) => {
 
   return (
     <>
-      <h3>{hasPassword ? 'Enter password for ' : 'Create a password for '}{person.name}</h3>
+      <h3>{hasPassword ? `Syötä salasana henkilölle ${person.name}` : `Luo salasana henkilölle ${person.name}`}</h3>
   <form onSubmit={handleSubmit} className="popup-form">
-        <input type="password" onChange={password.onChange} value={password.value} className="popup-input" />
-        <button type="submit">Submit</button>
+        <input type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 314 }} />
+        <button type="submit">Lähetä</button>
       </form>
       <div className="popup-error">{error}</div>
     </>
