@@ -219,6 +219,11 @@ button {
   color: #b00020;
 }
 
+.clocking-absent {
+  margin-top: 0.5rem;
+  color: #b38f00;
+}
+
 /* Time color indicators */
 .time-green { color: #0a7a0a; font-weight: 600; }
 .time-yellow { color: #b38f00; font-weight: 600; }
@@ -329,6 +334,11 @@ table.data-table td.clocking-message {
 table.data-table td.clocking-error {
   color: #b00020;
   font-weight: 700;
+}
+
+table.data-table td.clocking-absent {
+  color: #b38f00;
+  font-weight: 600;
 }
 
 .app-footer {

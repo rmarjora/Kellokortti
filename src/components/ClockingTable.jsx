@@ -4,13 +4,27 @@ import { getAllowedLateMinutes } from '../config.js';
 
 const ClockingTable = ({ user }) => {
   const [arrivals, setArrivals] = useState([]);
+  const [startDate, setStartDate] = useState(null); // user creation date
+  const [staff, setStaff] = useState([]);
   const allowedLateMinutes = getAllowedLateMinutes();
 
   useEffect(() => {
     const fetchArrivals = async () => {
-      const data = await window.api.getArrivals(user.id);
+      const [data, fullUser, staffList] = await Promise.all([
+        window.api.getArrivals(user.id),
+        window.api.getUser(user.id),
+        window.api.getStaff()
+      ]);
       setArrivals(data);
+      setStaff(Array.isArray(staffList) ? staffList : []);
       console.log("Fetched arrivals for user", user.id, data);
+      // Prefer user's creation time; fallback to earliest arrival
+      const created = fullUser?.time_created ? new Date(fullUser.time_created) : null;
+      const earliestArrival = data.length > 0
+        ? new Date(Math.min(...data.map(a => new Date(a.arrivalTime).getTime())))
+        : null;
+  const start = (created && !Number.isNaN(created.getTime())) ? created : (earliestArrival ?? null);
+      setStartDate(start);
     };
 
     fetchArrivals();
@@ -31,6 +45,27 @@ const ClockingTable = ({ user }) => {
   const unauthorizedArrivals = arrivals.filter(arrival => arrival.supervisorId == null);
   const averageLateMinutes = unauthorizedArrivals.length === 0 ? 0 : Math.round(unauthorizedArrivals.reduce((sum, arrival) => sum + getLateMinutes(arrival.arrivalTime), 0) / unauthorizedArrivals.length);
 
+  // Build a map of arrivals by local date string (fi-FI) for quick lookup
+  const arrivalByDate = new Map(
+    arrivals.map(a => [new Date(a.arrivalTime).toLocaleDateString('fi-FI'), a])
+  );
+
+  // Produce all weekdays (Mon-Fri) from startDate up to today inclusive
+  const days = [];
+  if (startDate) {
+    const cursor = new Date(startDate);
+    cursor.setHours(0,0,0,0);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    while (cursor <= today) {
+      const day = cursor.getDay(); // 0 Sun ... 6 Sat
+      if (day >= 1 && day <= 5) {
+        days.push(new Date(cursor));
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+  }
+
   return (
     <div>
       <h2>Kellotukset käyttäjälle: {user.name}</h2>
@@ -44,7 +79,20 @@ const ClockingTable = ({ user }) => {
           </tr>
         </thead>
         <tbody>
-          {arrivals.map((arrival) => {
+          {(days.length > 0 ? days : arrivals).map(entry => {
+            const d = entry instanceof Date ? entry : new Date(entry.arrivalTime);
+            const key = d.toLocaleDateString('fi-FI');
+            const arrival = entry instanceof Date ? arrivalByDate.get(key) : entry;
+            if (!arrival) {
+              return (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td>-</td>
+                  <td className="clocking-absent">Poissa</td>
+                </tr>
+              );
+            }
+
             const late = getLateMinutes(arrival.arrivalTime) > allowedLateMinutes;
             let label = '';
             let cls = '';
@@ -53,7 +101,7 @@ const ClockingTable = ({ user }) => {
               label = 'Ajoissa';
               cls = 'clocking-message';
             } else if (arrival.supervisorId != null) {
-              label = arrival.supervisorId < 0 ? 'Joku muu' : 'Lupa lisätty';
+              label = arrival.supervisorId < 0 ? 'Joku muu' : (staff.find(s => s.id === arrival.supervisorId)?.name || 'Tuntematon');
               cls = 'clocking-message';
             } else {
               label = 'Ei lupaa';

@@ -239,7 +239,7 @@ function getTodaysArrivals() {
 
 module.exports = { 
   initDatabase,
-  getUsers, getStudents, getSupervisors, addUser, deleteUser, clearUsers,
+  getUsers, getUser, getStudents, getSupervisors, addUser, deleteUser, clearUsers,
   setSetting, getSetting,
   hasPassword, setPassword, comparePassword, clearAllPasswords,
   addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals,
