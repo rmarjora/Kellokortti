@@ -13,7 +13,14 @@ function initDatabase() {
   db.exec(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    role TEXT NOT NULL CHECK (role IN ('student','supervisor','admin'))
+    time_created DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS staff (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT,
+    phone1 TEXT,
+    phone2 TEXT
   )`)
   db.exec(`CREATE TABLE IF NOT EXISTS passwordhashes (
     user_id INTEGER,
@@ -27,16 +34,68 @@ function initDatabase() {
     supervisor_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS adminPasswordHashes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    password_hash TEXT NOT NULL
+  )`)
   db.exec(`CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
-    value INTEGER NOT NULL
+    value TEXT NOT NULL
   )`)
   // Initialize default settings
   db.exec(`INSERT OR IGNORE INTO settings (key, value) VALUES
+    ('title', 'Kellokortti - Digitalents Academy'),
+    ('subtitle', 'Tervetuloa pajalle!'),
     ('work_start_time_hour', 9),
     ('work_start_time_minute', 0),
     ('allowed_late_minutes', 15)
   `)
+}
+
+// Returns a list of strings like:
+// "Name: email@example.com / 09 123 4567, 040 765 4321"
+function getStaffList() {
+  const rows = db.prepare('SELECT name, email, phone1, phone2 FROM staff').all();
+  return rows.map(({ name, email, phone1, phone2 }) => {
+    const parts = [];
+    if (email && String(email).trim().length > 0) {
+      parts.push(String(email).trim());
+    }
+    const phones = [phone1, phone2]
+      .map(p => (p == null ? '' : String(p).trim()))
+      .filter(p => p.length > 0)
+      .join(', ');
+    if (phones.length > 0) {
+      parts.push(phones);
+    }
+    const details = parts.join(' / ');
+    return `${name}: ${details || '-'}`;
+  });
+}
+
+function addStaff(name, email, phone1, phone2) {
+  db.prepare('INSERT INTO staff (name, email, phone1, phone2) VALUES (?, ?, ?, ?)').run([name, email, phone1, phone2]);
+}
+
+function adminPasswordExists() {
+  return db.prepare('SELECT 1 FROM adminPasswordHashes WHERE id = 1').get() !== undefined;
+}
+
+function setAdminPassword(password) {
+  return bcrypt.hash(password, 10).then(hash => {
+    db.prepare('INSERT OR REPLACE INTO adminPasswordHashes (id, password_hash) VALUES (1, ?)').run(hash);
+  });
+}
+
+function compareAdminPassword(password) {
+  return db.prepare('SELECT password_hash FROM adminPasswordHashes WHERE id = 1').get().then(row => {
+    if (!row) return false;
+    return bcrypt.compare(password, row.password_hash);
+  });
+}
+
+function clearAdminPassword() {
+  db.prepare('DELETE FROM adminPasswordHashes WHERE id = 1').run();
 }
 
 function getUsers() {
@@ -172,4 +231,5 @@ function getTodaysArrivals() {
 }
 
 module.exports = { initDatabase, getUsers, getStudents, getSupervisors, addUser, deleteUser, clearUsers, setSetting, getSetting,
-  hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals };
+  hasPassword, setPassword, comparePassword, clearAllPasswords, addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor,
+  getTodaysArrivals, getStaffList, addStaff, setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword };

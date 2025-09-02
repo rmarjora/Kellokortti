@@ -7,7 +7,7 @@ import Options from './Options';
 
 const NameList = ({ people, supervised }) => {
   if (people.length === 0) {
-    return <div>No people yet...</div>;
+    return <div>Henkilöitä ei ole</div>;
   }
 
   const [arrivals, setArrivals] = useState([]);

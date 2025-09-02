@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
+import useField from '../hooks/useField';
 
 const Settings = () => {
   const [hour, setHour] = useState(null);
   const [minute, setMinute] = useState(null);
   const [allowedLate, setAllowedLate] = useState(null);
+  const title = useField();
+  const subtitle = useField();
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
 
@@ -12,9 +15,13 @@ const Settings = () => {
       const h = await window.api.getSetting('work_start_time_hour');
       const m = await window.api.getSetting('work_start_time_minute');
       const a = await window.api.getSetting('allowed_late_minutes');
+      const title = await window.api.getSetting('title');
+      const subtitle = await window.api.getSetting('subtitle');
       setHour(String(h ?? 9));
       setMinute(String(m ?? 0));
       setAllowedLate(String(a ?? 15));
+      title.setValue(title);
+      subtitle.setValue(subtitle);
     };
     load();
   }, []);
@@ -51,7 +58,15 @@ const Settings = () => {
         </label>
         <label>
           Sallittu myöhästyminen (min):
-          <input type="number" min={0} max={180} value={allowedLate} onChange={e => setAllowedLate(e.target.value)} style={{ width: 100, marginLeft: 8 }} />
+          <input type="number" min={0} max={180} value={allowedLate} onChange={e => setAllowedLate(e.target.value)} style={{ width: 88, marginLeft: 8 }} />
+        </label>
+        <label>
+          Otsikko:
+          <input type="text" placeholder={title.value} onChange={title.onChange} style={{ marginLeft: 8 }} />
+        </label>
+        <label>
+          Alaotsikko:
+          <input type="text" placeholder={subtitle.value} onChange={subtitle.onChange} style={{ marginLeft: 8 }} />
         </label>
         <button type="button" onClick={save} disabled={saving}>Tallenna</button>
         {msg && <span className="badge">{msg}</span>}

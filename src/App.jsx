@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudents, addStudentAsync, clearStudentsAsync } from './store/studentsSlice';
 import NameList from './components/NameList';
-import SupervisorLogin from './components/SupervisorLogin';
 import Contact from './components/Contact';
 import useField from './hooks/useField';
 import Settings from './components/Settings';
 import Popup from './components/Popup';
+import AddStaff from './components/AddStaff';
 
 function App() {
   const dispatch = useDispatch();
@@ -15,6 +15,7 @@ function App() {
   const [supervisor, setSupervisor] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAddStaff, setShowAddStaff] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStudents());
@@ -30,8 +31,8 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Kellokortti - Digitalents Academy</h1>
-      <h2>Tervetuloa pajalle!</h2>
+      <h1 className='app-title'>Kellokortti - Digitalents Academy</h1>
+      <h2 className='app-subtitle'>Tervetuloa pajalle!</h2>
   <NameList people={students} supervised={!!supervisor || isAdmin} />
   {isAdmin && 
   <div>
@@ -40,15 +41,16 @@ function App() {
     <button onClick={handleAddStudent}>Lisää henkilö</button>
     <button onClick={() => setShowSettings(true)}>Asetukset</button>
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
+    <button onClick={() => setShowAddStaff(true)}>Lisää henkilökuntaa</button>
+    <Popup open={showAddStaff} onClose={() => setShowAddStaff(false)} exitText="Takaisin"><AddStaff /></Popup>
   </div>}
-  <SupervisorLogin onLogin={setSupervisor} onLogout={() => setSupervisor(null)} />
     {isAdmin && (
       <button onClick={() => dispatch(clearStudentsAsync())}>Tyhjennä opiskelijat</button>
     )}
     <button onClick={() => setIsAdmin(!isAdmin)}>
       {isAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
     </button>
-  <footer>
+  <footer className="app-footer">
     <Contact />
   </footer>
     </div>

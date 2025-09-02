@@ -29,6 +29,10 @@ app.whenReady().then(() => {
 });
 
 // IPC handlers
+ipcMain.handle('admin-password-exists', () => db.adminPasswordExists());
+ipcMain.handle('set-admin-password', (event, password) => db.setAdminPassword(password));
+ipcMain.handle('compare-admin-password', (event, password) => db.compareAdminPassword(password));
+ipcMain.handle('clear-admin-password', () => db.clearAdminPassword());
 ipcMain.handle('get-users', () => db.getUsers());
 ipcMain.handle('get-user', (event, userId) => db.getUser(userId));
 ipcMain.handle('get-students', () => db.getStudents());
@@ -48,6 +52,8 @@ ipcMain.handle('get-arrival-supervisor', (event, arrivalId) => db.getArrivalSupe
 ipcMain.handle('append-supervisor', (event, arrivalId, supervisorId) => db.appendSupervisor(arrivalId, supervisorId));
 ipcMain.handle('clear-all-arrivals', () => db.clearAllArrivals());
 ipcMain.handle('get-todays-arrivals', () => db.getTodaysArrivals());
+ipcMain.handle('get-staff-list', () => db.getStaffList());
+ipcMain.handle('add-staff', (event, name, email, phone1, phone2) => db.addStaff(name, email, phone1, phone2));
 // Settings handlers
 ipcMain.handle('get-setting', (event, key) => db.getSetting(key));
 ipcMain.handle('set-setting', (event, key, value) => db.setSetting(key, value));

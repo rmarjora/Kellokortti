@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
+  adminPasswordExists: () => ipcRenderer.invoke('admin-password-exists'),
+  setAdminPassword: (password) => ipcRenderer.invoke('set-admin-password', password),
+  compareAdminPassword: (password) => ipcRenderer.invoke('compare-admin-password', password),
+  clearAdminPassword: () => ipcRenderer.invoke('clear-admin-password'),
   getUsers: () => ipcRenderer.invoke('get-users'),
   getUser: (userId) => ipcRenderer.invoke('get-user', userId),
   getStudents: () => ipcRenderer.invoke('get-students'),
@@ -19,6 +23,8 @@ contextBridge.exposeInMainWorld('api', {
   setArrivalSupervisor: (arrivalId, supervisorId) => ipcRenderer.invoke('set-arrival-supervisor', arrivalId, supervisorId),
   clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals'),
   getTodaysArrivals: () => ipcRenderer.invoke('get-todays-arrivals'),
+  getStaffList: () => ipcRenderer.invoke('get-staff-list'),
+  addStaff: (name, email, phone1, phone2) => ipcRenderer.invoke('add-staff', name, email, phone1, phone2),
   // Settings
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
   setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value)

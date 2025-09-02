@@ -35,6 +35,11 @@ body {
   flex-direction: column;
   align-items: center; /* center blocks like cards, lists, buttons */
   text-align: center;  /* center text for headings and simple elements */
+  padding: auto;
+}
+
+.app-title {
+  font-size: 500%;
 }
 
 /* Fancy heading */
@@ -59,6 +64,19 @@ h1::after {
   border-radius: 999px;
   filter: blur(10px);
   opacity: 0.6;
+}
+
+/* App title and subtitle scaling */
+.app > h1 {
+  /* Large, responsive title */
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.app > h2 {
+  /* Prominent, responsive subtitle */
+  font-size: clamp(1.25rem, 3.2vw, 2.25rem);
+  line-height: 1.2;
 }
 
 /* Cards and containers */
@@ -207,8 +225,9 @@ button {
 .time-red { color: #b00020; font-weight: 700; }
 
 /* Inputs */
-input[type="text"], input[type="password"], select {
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select {
   padding: 0.6rem 0.75rem;
+  margin: 0.2rem;
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   background: #fff;
@@ -310,4 +329,12 @@ table.data-table td.clocking-message {
 table.data-table td.clocking-error {
   color: #b00020;
   font-weight: 700;
+}
+
+.app-footer {
+  padding: 20px;
+}
+
+.submit-button {
+  margin: 0.2rem;
 }
