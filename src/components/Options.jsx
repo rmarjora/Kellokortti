@@ -7,23 +7,30 @@ import { deleteStudentAsync } from "../store/studentsSlice";
 const Options = ({ user, supervised, onDeleted }) => {
 	const [showTable, setShowTable] = useState(false);
 	const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+	const [message, setMessage] = useState("");
 	const dispatch = useDispatch();
 
-		const handleDelete = async () => {
-			try {
-				await dispatch(deleteStudentAsync(user)).unwrap();
-				setShowConfirmDelete(false);
-				onDeleted?.();
-			} catch (e) {
-				console.error('Failed to delete student', e);
-			}
-		};
+	const handleDelete = async () => {
+		try {
+			await dispatch(deleteStudentAsync(user)).unwrap();
+			setShowConfirmDelete(false);
+			onDeleted?.();
+		} catch (e) {
+			console.error('Failed to delete student', e);
+		}
+	};
+
+	const handleResetPassword = async () => {
+		await window.api.clearPassword(user.id);
+		setMessage("Salasana nollattu");
+	};
 
 	return (
 		<div>
 			<button onClick={() => setShowTable(true)}>Tarkastele kellotuksia</button>
-			{!supervised && <button onClick={() => console.log("Option 2 selected")}>Muuta salasanaa</button>}
+			<button onClick={handleResetPassword}>Nollaa salasana</button>
 			{supervised && <button onClick={() => setShowConfirmDelete(true)}>Poista henkilö</button>}
+			{message && <span className="badge">{message}</span>}
 			<Popup open={showTable} onClose={() => setShowTable(false)} exitText='Sulje'>
 				<ClockingTable user={user} />
 			</Popup>

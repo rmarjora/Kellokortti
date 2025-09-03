@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('api', {
   hasPassword: (userId) => ipcRenderer.invoke('has-password', userId),
   setPassword: (userId, password) => ipcRenderer.invoke('set-password', userId, password),
   comparePassword: (userId, password) => ipcRenderer.invoke('compare-password', userId, password),
-  clearAllPasswords: () => ipcRenderer.invoke('clear-all-passwords'),
+  clearPassword: (userId) => ipcRenderer.invoke('clear-password', userId),
   addArrival: (userId, arrivalTime) => ipcRenderer.invoke('add-arrival', userId, arrivalTime),
   getArrivalToday: (userId) => ipcRenderer.invoke('get-arrival-today', userId),
   getArrivals: (userId) => ipcRenderer.invoke('get-arrivals', userId),
@@ -24,8 +24,9 @@ contextBridge.exposeInMainWorld('api', {
   clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals'),
   getTodaysArrivals: () => ipcRenderer.invoke('get-todays-arrivals'),
   getStaffList: () => ipcRenderer.invoke('get-staff-list'),
-    getStaff: () => ipcRenderer.invoke('get-staff'),
-    addStaff: (staff) => ipcRenderer.invoke('add-staff', staff),
+  getStaff: () => ipcRenderer.invoke('get-staff'),
+  addStaff: (staff) => ipcRenderer.invoke('add-staff', staff),
+  deleteStaff: (id) => ipcRenderer.invoke('delete-staff', id),
   // Settings
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
   setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value)

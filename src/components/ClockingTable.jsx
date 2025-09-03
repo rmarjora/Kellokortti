@@ -100,12 +100,21 @@ const ClockingTable = ({ user }) => {
             if (!late) {
               label = 'Ajoissa';
               cls = 'clocking-message';
-            } else if (arrival.supervisorId != null) {
-              label = arrival.supervisorId < 0 ? 'Joku muu' : (staff.find(s => s.id === arrival.supervisorId)?.name || 'Tuntematon');
+            } else if (arrival.supervisorId === null) {
+              label = 'Ei lupaa';
+              cls = 'clocking-error'
+            } else if (arrival.supervisorId < 0) {
+              label = 'Joku muu';
               cls = 'clocking-message';
             } else {
-              label = 'Ei lupaa';
-              cls = 'clocking-error';
+              const supervisorName = staff.find(s => s.id === arrival.supervisorId)?.name;
+              if (supervisorName) {
+                label = supervisorName;
+                cls = 'clocking-message';
+              } else {
+                label = 'Tuntematon';
+                cls = 'clocking-error';
+              }
             }
 
             return (
@@ -124,6 +133,7 @@ const ClockingTable = ({ user }) => {
         <p>Kellotuksia yhteensä: {arrivals.length}</p>
         <p>{averageLateMinutes >= 0 ? `Myöhässä keskimäärin: ${averageLateMinutes} minuuttia` : `Keskimäärin ${-averageLateMinutes} minuuttia liian ajoissa`}</p>
         <p>Luvattomia yli {allowedLateMinutes} min myöhästymisiä: {unauthorizedArrivals.filter(arrival => getLateMinutes(arrival.arrivalTime) > allowedLateMinutes).length}</p>
+        <p>Poissaoloja: {arrivals.filter(arrival => arrival.supervisorId === null).length}</p>
       </div>
     </div>
   )

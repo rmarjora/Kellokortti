@@ -16,8 +16,6 @@ const Settings = () => {
       setHour(String(h ?? 9));
       setMinute(String(m ?? 0));
       setAllowedLate(String(a ?? 15));
-  title.setValue(String(t ?? ''));
-  subtitle.setValue(String(s ?? ''));
     };
     load();
   }, []);

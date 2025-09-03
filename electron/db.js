@@ -52,27 +52,6 @@ function initDatabase() {
   `)
 }
 
-// Returns a list of strings like:
-// "Name: email@example.com / 09 123 4567, 040 765 4321"
-function getStaffList() {
-  const rows = db.prepare('SELECT name, email, phone1, phone2 FROM staff').all();
-  return rows.map(({ name, email, phone1, phone2 }) => {
-    const parts = [];
-    if (email && String(email).trim().length > 0) {
-      parts.push(String(email).trim());
-    }
-    const phones = [phone1, phone2]
-      .map(p => (p == null ? '' : String(p).trim()))
-      .filter(p => p.length > 0)
-      .join(', ');
-    if (phones.length > 0) {
-      parts.push(phones);
-    }
-    const details = parts.join(' / ');
-    return `${name}: ${details || '-'}`;
-  });
-}
-
 function getStaff() {
   return db.prepare('SELECT id, name, email, phone1, phone2 FROM staff').all();
 }
@@ -84,21 +63,30 @@ function addStaff(staff) {
   return { id: info.lastInsertRowid, name, email, phone1, phone2 };
 }
 
+function deleteStaff(id) {
+  try {
+    const info = db.prepare('DELETE FROM staff WHERE id = ?').run(id);
+    return info.changes > 0;
+  } catch (e) {
+    console.error('deleteStaff failed', e);
+    return false;
+  }
+}
+
 function adminPasswordExists() {
   return db.prepare('SELECT 1 FROM adminPasswordHashes WHERE id = 1').get() !== undefined;
 }
 
-function setAdminPassword(password) {
-  return bcrypt.hash(password, 10).then(hash => {
-    db.prepare('INSERT OR REPLACE INTO adminPasswordHashes (id, password_hash) VALUES (1, ?)').run(hash);
-  });
+async function setAdminPassword(password) {
+  const hash = await bcrypt.hash(password, 10);
+  db.prepare('INSERT OR REPLACE INTO adminPasswordHashes (id, password_hash) VALUES (1, ?)').run(hash);
 }
 
-function compareAdminPassword(password) {
-  return db.prepare('SELECT password_hash FROM adminPasswordHashes WHERE id = 1').get().then(row => {
-    if (!row) return false;
-    return bcrypt.compare(password, row.password_hash);
-  });
+async function compareAdminPassword(password) {
+  const row = db.prepare('SELECT password_hash FROM adminPasswordHashes WHERE id = 1').get();
+  console.log("Comparing admin password, row:", row);
+  if (!row) return false;
+  return await bcrypt.compare(password, row.password_hash);
 }
 
 function clearAdminPassword() {
@@ -168,8 +156,8 @@ async function comparePassword(userId, password) {
   return await bcrypt.compare(password, row.password_hash);
 }
 
-function clearAllPasswords() {
-  db.prepare('DELETE FROM passwordhashes').run();
+function clearPassword(userId) {
+  db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
 }
 
 function getArrivalToday(userId) {
@@ -197,12 +185,6 @@ function addArrival(userId, arrivalTime = null) {
   db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, NULL)')
     .run(userId, arrivalTime);
   return { id: db.lastInsertRowid, arrivalTime };
-}
-
-function getArrivalSupervisor(arrivalId) {
-  const row = db.prepare('SELECT supervisor_id FROM arrivalTimes WHERE arrival_id = ?').get(arrivalId);
-  if (!row || row.supervisor_id == null) return null;
-  return db.prepare('SELECT * FROM users WHERE id = ?').get(row.supervisor_id);
 }
 
 function getArrivals(userId) {
@@ -241,10 +223,10 @@ module.exports = {
   initDatabase,
   getUsers, getUser, getStudents, getSupervisors, addUser, deleteUser, clearUsers,
   setSetting, getSetting,
-  hasPassword, setPassword, comparePassword, clearAllPasswords,
+  hasPassword, setPassword, comparePassword, clearPassword,
   addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals,
   // Staff
-  getStaffList, getStaff, addStaff,
+  getStaff, addStaff, deleteStaff,
   // Admin password helpers
   setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword
 };

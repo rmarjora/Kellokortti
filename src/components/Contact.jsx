@@ -1,6 +1,6 @@
 const Contact = ({ staff }) => {
 	if (!staff) return null;
-	const { name, email, phone1, phone2 } = staff;
+	const { id, name, email, phone1, phone2 } = staff;
 	const parts = [];
 	if (email) parts.push(email);
 	const phones = [phone1, phone2].filter(Boolean).join(', ');

@@ -184,6 +184,7 @@ button {
   background: linear-gradient(180deg, #ffffff, #f5f2ff);
   color: #2b2b2b;
   font-weight: 600;
+  margin: 0.25rem;
   transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
 }
 
@@ -199,6 +200,7 @@ button {
   border: none;
   background: #fff;
   padding: 0.6rem 1rem;
+  margin: 0; /* override global margin inside groups */
 }
 
 .button-group > button + button {

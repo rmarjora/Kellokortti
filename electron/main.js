@@ -43,7 +43,7 @@ ipcMain.handle('clear-users', () => db.clearUsers());
 ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));
 ipcMain.handle('set-password', (event, userId, password) => db.setPassword(userId, password));
 ipcMain.handle('compare-password', (event, userId, password) => db.comparePassword(userId, password));
-ipcMain.handle('clear-all-passwords', () => db.clearAllPasswords());
+ipcMain.handle('clear-password', (event, userId) => db.clearPassword(userId));
 ipcMain.handle('add-arrival', (event, userId, arrivalTime) => db.addArrival(userId, arrivalTime));
 ipcMain.handle('get-arrival-today', (event, userId) => db.getArrivalToday(userId));
 ipcMain.handle('get-arrivals', (event, userId) => db.getArrivals(userId));
@@ -54,6 +54,7 @@ ipcMain.handle('get-todays-arrivals', () => db.getTodaysArrivals());
 ipcMain.handle('get-staff-list', () => db.getStaffList());
 ipcMain.handle('get-staff', () => db.getStaff());
 ipcMain.handle('add-staff', (event, staff) => db.addStaff(staff));
+ipcMain.handle('delete-staff', (event, id) => db.deleteStaff(id));
 // Settings handlers
 ipcMain.handle('get-setting', (event, key) => db.getSetting(key));
 ipcMain.handle('set-setting', (event, key, value) => db.setSetting(key, value));

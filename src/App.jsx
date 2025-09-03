@@ -6,6 +6,7 @@ import ContactList from './components/ContactList';
 import useField from './hooks/useField';
 import Settings from './components/Settings';
 import Popup from './components/Popup';
+import AdminLogin from './components/AdminLogin';
 import AddStaff from './components/AddStaff';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const students = useSelector(state => state.students.items);
   const name = useField()
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showAddStaff, setShowAddStaff] = useState(false);
   const [appTitle, setAppTitle] = useState('Kellokortti - Digitalents Academy');
@@ -147,11 +149,20 @@ function App() {
     {isAdmin && (
       <button onClick={() => dispatch(clearStudentsAsync())}>Tyhjennä opiskelijat</button>
     )}
-    <button onClick={() => setIsAdmin(!isAdmin)}>
-      {isAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
-    </button>
+    {isAdmin ? (
+      <button onClick={() => setIsAdmin(false)}>
+        Ylläpitäjän uloskirjautuminen
+      </button>
+    ) : (
+      <button onClick={() => setShowAdminLogin(true)}>
+        Ylläpitäjän kirjautuminen
+      </button>
+    )}
+    <Popup open={showAdminLogin} onClose={() => setShowAdminLogin(false)} exitText="Peruuta">
+      <AdminLogin onSuccess={() => { setIsAdmin(true); setShowAdminLogin(false); }} />
+    </Popup>
   <footer className="app-footer">
-    <ContactList />
+    <ContactList isAdmin={isAdmin} />
   </footer>
     </div>
   );
