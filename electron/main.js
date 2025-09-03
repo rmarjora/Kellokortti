@@ -35,9 +35,27 @@ ipcMain.handle('compare-admin-password', (event, password) => db.compareAdminPas
 ipcMain.handle('clear-admin-password', () => db.clearAdminPassword());
 ipcMain.handle('get-users', () => db.getUsers());
 ipcMain.handle('get-user', (event, userId) => db.getUser(userId));
-ipcMain.handle('get-students', () => db.getStudents());
-ipcMain.handle('get-supervisors', () => db.getSupervisors());
-ipcMain.handle('add-user', (event, user) => db.addUser(user));
+ipcMain.handle('get-students', () => {
+  try {
+    const list = db.getStudents();
+    console.log('[IPC] get-students ->', Array.isArray(list) ? list.length : 'n/a');
+    return list;
+  } catch (e) {
+    console.error('[IPC] get-students failed', e);
+    throw e;
+  }
+});
+ipcMain.handle('add-user', (event, user) => {
+  try {
+    console.log('[IPC] add-user <-', user);
+    const created = db.addUser(user);
+    console.log('[IPC] add-user ->', created);
+    return created;
+  } catch (e) {
+    console.error('[IPC] add-user failed', e);
+    throw e;
+  }
+});
 ipcMain.handle('delete-user', (event, userId) => db.deleteUser(userId));
 ipcMain.handle('clear-users', () => db.clearUsers());
 ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));

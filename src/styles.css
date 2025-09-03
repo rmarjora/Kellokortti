@@ -24,6 +24,10 @@ body {
   font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
 }
 
+.admin-panel {
+  margin: 1rem;
+}
+
 /* App wrapper */
 .app, body > div#root > div {
   padding: 2rem;

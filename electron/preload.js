@@ -8,7 +8,6 @@ contextBridge.exposeInMainWorld('api', {
   getUsers: () => ipcRenderer.invoke('get-users'),
   getUser: (userId) => ipcRenderer.invoke('get-user', userId),
   getStudents: () => ipcRenderer.invoke('get-students'),
-  getSupervisors: () => ipcRenderer.invoke('get-supervisors'),
   addUser: (user) => ipcRenderer.invoke('add-user', user),
   deleteUser: (userId) => ipcRenderer.invoke('delete-user', userId),
   clearUsers: () => ipcRenderer.invoke('clear-users'),

@@ -1,10 +1,11 @@
 import useField from "../hooks/useField";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PersonLogin = ({ person, onSuccess }) => {
   const password = useField();
   const [hasPassword, setHasPassword] = useState(undefined);
   const [error, setError] = useState("");
+  const inputRef = useRef(null);
 
   if (!person) return <h2>Something went wrong</h2>;
 
@@ -21,6 +22,13 @@ const PersonLogin = ({ person, onSuccess }) => {
     };
     fetchHasPassword();
   }, [person]);
+
+  // Focus the input when the login view becomes available
+  useEffect(() => {
+    if (hasPassword !== undefined) {
+      inputRef.current?.focus();
+    }
+  }, [hasPassword]);
 
   if (hasPassword === undefined) return <div>Loading…</div>;
 
@@ -54,7 +62,7 @@ const PersonLogin = ({ person, onSuccess }) => {
     <>
       <h3>{hasPassword ? `Syötä salasana henkilölle ${person.name}` : `Luo salasana henkilölle ${person.name}`}</h3>
   <form onSubmit={handleSubmit} className="popup-form">
-        <input type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 314 }} />
+  <input ref={inputRef} autoFocus type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 314 }} />
         <button type="submit">Lähetä</button>
       </form>
       <div className="popup-error">{error}</div>

@@ -6,13 +6,13 @@ const bcrypt = require('bcryptjs');
 let db;
 
 function initDatabase() {
-  const dbPath = path.join(app.getPath('userData'), 'app.db2');
+  const dbPath = path.join(app.getPath('userData'), 'app2.db');
   db = new Database(dbPath);
   // Ensure FK constraints are enforced
   db.pragma('foreign_keys = ON');
   db.exec(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
+  name TEXT,
     time_created DATETIME DEFAULT CURRENT_TIMESTAMP
   )`)
   db.exec(`CREATE TABLE IF NOT EXISTS staff (
@@ -102,17 +102,13 @@ function getUser(userId) {
 }
 
 function getStudents() {
-  return db.prepare("SELECT * FROM users WHERE role = 'student'").all();
-}
-
-function getSupervisors() {
-  return db.prepare("SELECT * FROM users WHERE role = 'supervisor'").all();
+  // All entries in users are students; staff are in a separate table
+  return db.prepare('SELECT * FROM users').all();
 }
 
 function addUser(user) {
-  const role = user.role ?? 'student';
-  const info = db.prepare('INSERT INTO users (name, role) VALUES (?, ?)').run([user.name, role]);
-  return { id: info.lastInsertRowid, ...user };
+  const info = db.prepare('INSERT INTO users (name) VALUES (?)').run([user.name]);
+  return { id: info.lastInsertRowid, name: user.name };
 }
 
 function deleteUser(userId) {
@@ -221,7 +217,7 @@ function getTodaysArrivals() {
 
 module.exports = { 
   initDatabase,
-  getUsers, getUser, getStudents, getSupervisors, addUser, deleteUser, clearUsers,
+  getUsers, getUser, getStudents, addUser, deleteUser, clearUsers,
   setSetting, getSetting,
   hasPassword, setPassword, comparePassword, clearPassword,
   addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals,

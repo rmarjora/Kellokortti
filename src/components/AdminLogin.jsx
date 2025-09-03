@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useField from '../hooks/useField';
 
 const AdminLogin = ({ onSuccess }) => {
@@ -9,6 +9,7 @@ const AdminLogin = ({ onSuccess }) => {
   const [info, setInfo] = useState('');
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     let mounted = true;
@@ -25,6 +26,12 @@ const AdminLogin = ({ onSuccess }) => {
     load();
     return () => { mounted = false; };
   }, []);
+
+  // Focus the first input when the view becomes available or state changes
+  useEffect(() => {
+    if (exists === undefined) return;
+    inputRef.current?.focus();
+  }, [exists]);
 
   if (exists === undefined) return <div>Loading…</div>;
 
@@ -95,6 +102,8 @@ const AdminLogin = ({ onSuccess }) => {
       )}
       <form onSubmit={handleSubmit} className="popup-form">
         <input
+          ref={inputRef}
+          autoFocus
           type="password"
           placeholder={exists ? 'Salasana' : 'Uusi salasana'}
           onChange={password.onChange}
@@ -116,18 +125,6 @@ const AdminLogin = ({ onSuccess }) => {
           <button type="submit">{exists ? 'Kirjaudu' : 'Luo salasana'}</button>
         </div>
       </form>
-      {exists && (
-        <div style={{ marginTop: 12 }}>
-          <button type="button" onClick={handleReset} disabled={resetting}>
-            {confirmReset ? 'Vahvista nollaus' : 'Nollaa admin-salasana (väliaikainen)'}
-          </button>
-          {confirmReset && (
-            <button type="button" onClick={() => { setConfirmReset(false); setInfo(''); }} style={{ marginLeft: 8 }}>
-              Peruuta
-            </button>
-          )}
-        </div>
-      )}
       <div className="popup-error">{error}</div>
       {info && <div className="badge">{info}</div>}
     </div>

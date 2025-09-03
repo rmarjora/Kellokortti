@@ -8,6 +8,7 @@ import Settings from './components/Settings';
 import Popup from './components/Popup';
 import AdminLogin from './components/AdminLogin';
 import AddStaff from './components/AddStaff';
+import CurrentTime from './components/CurrentTime';
 
 function App() {
   const dispatch = useDispatch();
@@ -50,12 +51,19 @@ function App() {
     return () => { mounted = false; };
   }, []);
 
-  const handleAddStudent = (event) => {
+  const handleAddStudent = async (event) => {
     event.preventDefault();
     const studentName = name.value.trim();
-    if (studentName) {
-  dispatch(addStudentAsync({ name: studentName }));
+    console.log("Adding student:", studentName);
+    if (!studentName) return;
+    try {
+      await dispatch(addStudentAsync({ name: studentName })).unwrap();
+      // Force refresh to ensure list reflects DB state
+      await dispatch(fetchStudents());
       name.setValue('');
+    } catch (e) {
+      console.error('Failed to add student', e);
+      // Optional: surface error to user later if desired
     }
   };
 
@@ -136,12 +144,13 @@ function App() {
           {appSubtitle}
         </h2>
       )}
-  <NameList people={students} supervised={isAdmin} />
+      <CurrentTime />
+      <NameList people={students} supervised={isAdmin} />
   {isAdmin && 
-  <div>
+  <div className='admin-panel'>
     <form onSubmit={handleAddStudent}>
       <input type="text" placeholder="nimi" onChange={name.onChange} value={name.value}/>
-      <button type="submit" onClick={handleAddStudent}>Lisää nimi</button>
+      <button type="submit">Lisää nimi</button>
     </form>
     <button onClick={() => setShowSettings(true)}>Työpäivän asetukset</button>
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
