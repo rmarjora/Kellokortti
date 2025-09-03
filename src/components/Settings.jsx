@@ -42,8 +42,8 @@ const Settings = () => {
   };
 
   return (
-    <div className="card" style={{ marginTop: '1rem' }}>
-      <h3>Asetukset</h3>
+    <>
+      <h3>Työpäivän setukset</h3>
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <label>
           Työpäivän aloitusaika:
@@ -57,7 +57,7 @@ const Settings = () => {
         <button type="button" onClick={save} disabled={saving}>Tallenna</button>
         {msg && <span className="badge">{msg}</span>}
       </div>
-    </div>
+    </>
   );
 };
 

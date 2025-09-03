@@ -50,7 +50,8 @@ function App() {
     return () => { mounted = false; };
   }, []);
 
-  const handleAddStudent = () => {
+  const handleAddStudent = (event) => {
+    event.preventDefault();
     const studentName = name.value.trim();
     if (studentName) {
   dispatch(addStudentAsync({ name: studentName }));
@@ -138,16 +139,15 @@ function App() {
   <NameList people={students} supervised={isAdmin} />
   {isAdmin && 
   <div>
-    <input type="text" onChange={name.onChange} value={name.value}/>
-    <button onClick={handleAddStudent}>Lisää henkilö</button>
-    <button onClick={() => setShowSettings(true)}>Asetukset</button>
+    <form onSubmit={handleAddStudent}>
+      <input type="text" placeholder="nimi" onChange={name.onChange} value={name.value}/>
+      <button type="submit" onClick={handleAddStudent}>Lisää nimi</button>
+    </form>
+    <button onClick={() => setShowSettings(true)}>Työpäivän asetukset</button>
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
     <button onClick={() => setShowAddStaff(true)}>Lisää henkilökuntaa</button>
     <Popup open={showAddStaff} onClose={() => setShowAddStaff(false)} exitText="Takaisin"><AddStaff /></Popup>
   </div>}
-    {isAdmin && (
-      <button onClick={() => dispatch(clearStudentsAsync())}>Tyhjennä opiskelijat</button>
-    )}
     {isAdmin ? (
       <button onClick={() => setIsAdmin(false)}>
         Ylläpitäjän uloskirjautuminen
