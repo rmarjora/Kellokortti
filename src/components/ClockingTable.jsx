@@ -50,14 +50,22 @@ const ClockingTable = ({ user }) => {
     arrivals.map(a => [new Date(a.arrivalTime).toLocaleDateString('fi-FI'), a])
   );
 
+  // Detect if there is an arrival today
+  const todayKey = new Date().toLocaleDateString('fi-FI');
+  const hasTodayArrival = arrivalByDate.has(todayKey);
+
   // Produce all weekdays (Mon-Fri) from startDate up to today inclusive
   const days = [];
   if (startDate) {
     const cursor = new Date(startDate);
     cursor.setHours(0,0,0,0);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    while (cursor <= today) {
+    const endDate = new Date();
+    endDate.setHours(0,0,0,0);
+    // Exclude today unless already clocked in today
+    if (!hasTodayArrival) {
+      endDate.setDate(endDate.getDate() - 1);
+    }
+    while (cursor <= endDate) {
       const day = cursor.getDay(); // 0 Sun ... 6 Sat
       if (day >= 1 && day <= 5) {
         days.push(new Date(cursor));
@@ -65,6 +73,11 @@ const ClockingTable = ({ user }) => {
       cursor.setDate(cursor.getDate() + 1);
     }
   }
+
+  // Count absent days among generated weekdays
+  const absentDays = days.length === 0
+    ? 0
+    : days.reduce((cnt, d) => cnt + (arrivalByDate.has(d.toLocaleDateString('fi-FI')) ? 0 : 1), 0);
 
   return (
     <div>
@@ -133,7 +146,7 @@ const ClockingTable = ({ user }) => {
         <p>Kellotuksia yhteensä: {arrivals.length}</p>
         <p>{averageLateMinutes >= 0 ? `Myöhässä keskimäärin: ${averageLateMinutes} minuuttia` : `Keskimäärin ${-averageLateMinutes} minuuttia liian ajoissa`}</p>
         <p>Luvattomia yli {allowedLateMinutes} min myöhästymisiä: {unauthorizedArrivals.filter(arrival => getLateMinutes(arrival.arrivalTime) > allowedLateMinutes).length}</p>
-        <p>Poissaoloja: {arrivals.filter(arrival => arrival.supervisorId === null).length}</p>
+  <p>Poissaoloja: {absentDays}</p>
       </div>
     </div>
   )

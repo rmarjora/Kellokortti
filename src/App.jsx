@@ -138,7 +138,6 @@ function App() {
   <NameList people={students} supervised={isAdmin} />
   {isAdmin && 
   <div>
-    <h3>Admin Panel</h3>
     <input type="text" onChange={name.onChange} value={name.value}/>
     <button onClick={handleAddStudent}>Lisää henkilö</button>
     <button onClick={() => setShowSettings(true)}>Asetukset</button>
