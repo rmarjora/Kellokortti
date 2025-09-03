@@ -2,17 +2,15 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 const Popup = ({ open, onClose, exitText, children }) => {
-  // Always call hooks; only attach listeners when open
+  if (!open) return null;
+
   useEffect(() => {
-    if (!open) return;
     const onKey = (e) => {
       if (e.key === 'Escape') onClose?.();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
+  }, [onClose]);
 
   return createPortal(
     <div className="popup-overlay" onClick={onClose}>
