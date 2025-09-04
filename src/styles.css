@@ -10,6 +10,11 @@
   --accent: #06b6d4; /* cyan */
   --accent-2: #f97316; /* orange */
   --ring: rgba(124, 58, 237, 0.35);
+  /* Danger palette */
+  --danger: #ef4444;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-ring: rgba(239, 68, 68, 0.35);
 }
 
 html, body, #root {
@@ -192,6 +197,25 @@ button {
   transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
 }
 
+/* Destructive action button */
+button.danger {
+  background: linear-gradient(180deg, var(--danger), var(--danger-600));
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+button.danger:hover {
+  background: linear-gradient(180deg, #f05252, var(--danger-700));
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+}
+
+button.danger:focus,
+button.danger:focus-visible {
+  outline: 3px solid var(--danger-ring);
+  outline-offset: 2px;
+}
+
 /* Horizontal button group */
 .button-group {
   display: inline-flex;
@@ -213,6 +237,16 @@ button {
 
 .button-group > button:hover {
   background: linear-gradient(180deg, #ffffff, #f2f2ff);
+}
+
+/* Ensure danger buttons keep their red style inside button groups */
+.button-group > button.danger {
+  background: linear-gradient(180deg, var(--danger), var(--danger-600));
+  color: #fff;
+}
+
+.button-group > button.danger:hover {
+  background: linear-gradient(180deg, #f05252, var(--danger-700));
 }
 
 .clocking-message {
@@ -255,6 +289,11 @@ input:focus, select:focus {
 button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 24px rgba(124, 58, 237, 0.15);
+}
+
+/* Ensure danger keeps red shadow on hover despite global rule above */
+button.danger:hover {
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
 }
 
 button:active {
