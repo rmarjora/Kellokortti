@@ -109,6 +109,7 @@ h1::after {
   gap: 2vw; /* spacing scales with tile size (15vw width) */
   align-items: flex-start;
   justify-content: center; /* center the tiles within the row */
+  margin: 2rem;
 }
 
 /* Clickable name box */
