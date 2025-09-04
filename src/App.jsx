@@ -22,6 +22,7 @@ function App() {
   const [appSubtitle, setAppSubtitle] = useState('Tervetuloa pajalle!');
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingSubtitle, setEditingSubtitle] = useState(false);
+  const [message, setMessage] = useState('');
   const titleInputRef = useRef(null);
   const subtitleInputRef = useRef(null);
   const prevTitleRef = useRef('');
@@ -91,6 +92,17 @@ function App() {
     }
   };
 
+  const handleResetPassword = async (event) => {
+    event.preventDefault();
+    try {
+      await window.api.clearAdminPassword();
+      setMessage('Salasana nollattu');
+    } catch (e) {
+      console.error('Failed to reset admin password', e);
+      setMessage('Salasanan nollaaminen epäonnistui');
+    }
+  };
+
   return (
     <div className="app">
   {editingTitle ? (
@@ -156,13 +168,18 @@ function App() {
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
     <button onClick={() => setShowAddStaff(true)}>Lisää henkilökuntaa</button>
     <Popup open={showAddStaff} onClose={() => setShowAddStaff(false)} exitText="Takaisin"><AddStaff /></Popup>
+    <button onClick={handleResetPassword}>Nollaa ylläpitäjän salasana</button>
+    {message && <div className='badge'>{message}</div>}
   </div>}
     {isAdmin ? (
       <button onClick={() => setIsAdmin(false)}>
         Ylläpitäjän uloskirjautuminen
       </button>
     ) : (
-      <button onClick={() => setShowAdminLogin(true)}>
+      <button onClick={() => {
+        setShowAdminLogin(true);
+        setMessage('');
+      }}>
         Ylläpitäjän kirjautuminen
       </button>
     )}
