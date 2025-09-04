@@ -168,11 +168,11 @@ function App() {
     <Popup open={showSettings} onClose={() => setShowSettings(false)} exitText="Sulje"><Settings /></Popup>
     <button onClick={() => setShowAddStaff(true)}>Lisää henkilökuntaa</button>
     <Popup open={showAddStaff} onClose={() => setShowAddStaff(false)} exitText="Takaisin"><AddStaff /></Popup>
-    <button onClick={handleResetPassword}>Nollaa ylläpitäjän salasana</button>
+    <button className="reset"onClick={handleResetPassword}>Nollaa ylläpitäjän salasana</button>
     {message && <div className='badge'>{message}</div>}
   </div>}
     {isAdmin ? (
-      <button onClick={() => setIsAdmin(false)}>
+      <button className='back' onClick={() => setIsAdmin(false)}>
         Ylläpitäjän uloskirjautuminen
       </button>
     ) : (

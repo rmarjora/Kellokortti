@@ -28,7 +28,7 @@ const Options = ({ user, supervised, onDeleted }) => {
 	return (
 		<div>
 			<button onClick={() => setShowTable(true)}>Tarkastele kellotuksia</button>
-			<button onClick={handleResetPassword}>Nollaa salasana</button>
+			<button className="reset" onClick={handleResetPassword}>Nollaa salasana</button>
 			{supervised && <button onClick={() => setShowConfirmDelete(true)}>Poista henkilö</button>}
 			{message && <span className="badge">{message}</span>}
 			<Popup open={showTable} onClose={() => setShowTable(false)} exitText='Sulje'>

@@ -19,7 +19,7 @@ const Popup = ({ open, onClose, exitText, children }) => {
           {children}
         </div>
         <div className="popup-actions">
-          <button type="button" onClick={onClose}>{exitText}</button>
+          <button className="back" type="button" onClick={onClose}>{exitText}</button>
         </div>
       </div>
     </div>,

@@ -15,6 +15,11 @@
   --danger-600: #dc2626;
   --danger-700: #b91c1c;
   --danger-ring: rgba(239, 68, 68, 0.35);
+  /* Neutral palette for reset/secondary */
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+  --neutral-ring: rgba(107, 114, 128, 0.3);
 }
 
 html, body, #root {
@@ -202,17 +207,56 @@ button.danger {
   background: linear-gradient(180deg, var(--danger), var(--danger-600));
   color: #fff;
   border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  box-shadow: none;
 }
 
 button.danger:hover {
   background: linear-gradient(180deg, #f05252, var(--danger-700));
-  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+  box-shadow: none;
 }
 
 button.danger:focus,
 button.danger:focus-visible {
   outline: 3px solid var(--danger-ring);
+  outline-offset: 2px;
+}
+
+/* Secondary/reset button */
+button.reset {
+  background: linear-gradient(180deg, #ffffff, #f7f7f9);
+  color: var(--neutral-700);
+  border: 1px solid rgba(107, 114, 128, 0.25);
+  box-shadow: none;
+}
+
+button.reset:hover {
+  background: linear-gradient(180deg, #ffffff, #eef1f5);
+  box-shadow: none;
+}
+
+button.reset:focus,
+button.reset:focus-visible {
+  outline: 3px solid var(--neutral-ring);
+  outline-offset: 2px;
+}
+
+/* Tertiary/back button */
+button.back {
+  background: linear-gradient(180deg, #f3f4f6, #e5e7eb);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: var(--neutral-700);
+  box-shadow: none;
+}
+
+button.back:hover {
+  background: linear-gradient(180deg, #e5e7eb, #d1d5db);
+  color: var(--neutral-700);
+  box-shadow: none;
+}
+
+button.back:focus,
+button.back:focus-visible {
+  outline: 3px solid var(--neutral-ring);
   outline-offset: 2px;
 }
 
@@ -247,6 +291,27 @@ button.danger:focus-visible {
 
 .button-group > button.danger:hover {
   background: linear-gradient(180deg, #f05252, var(--danger-700));
+}
+
+/* Keep reset style within button groups */
+.button-group > button.reset {
+  background: linear-gradient(180deg, #ffffff, #f7f7f9);
+  color: var(--neutral-700);
+  border-left: 1px solid rgba(0,0,0,0.08); /* maintain divider consistency */
+}
+
+.button-group > button.reset:hover {
+  background: linear-gradient(180deg, #ffffff, #eef1f5);
+}
+
+/* Keep back style within button groups */
+.button-group > button.back {
+  background: linear-gradient(180deg, #f3f4f6, #e5e7eb);
+  color: var(--neutral-700);
+}
+
+.button-group > button.back:hover {
+  background: linear-gradient(180deg, #e5e7eb, #d1d5db);
 }
 
 .clocking-message {
@@ -288,12 +353,28 @@ input:focus, select:focus {
 /* Fancy hover for primary actions */
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.15);
+  box-shadow: none;
+  background: linear-gradient(180deg, #ffffff, #ecebff);
 }
 
 /* Ensure danger keeps red shadow on hover despite global rule above */
 button.danger:hover {
-  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+  box-shadow: none;
+}
+
+/* Ensure reset keeps neutral shadow on hover */
+button.reset:hover {
+  box-shadow: none;
+}
+
+/* Ensure back keeps neutral shadow on hover */
+button.back:hover {
+  box-shadow: none;
+}
+
+/* Keep button-group default hover look after global hover rule */
+.button-group > button:hover {
+  background: linear-gradient(180deg, #ffffff, #f2f2ff);
 }
 
 button:active {
