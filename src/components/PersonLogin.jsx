@@ -50,7 +50,7 @@ const PersonLogin = ({ person, onSuccess }) => {
     } else {
       // Verify existing password
       const isValid = await window.api.comparePassword(person.id, password.value);
-      setError(isValid ? "" : "Invalid password");
+      setError(isValid ? "" : "Väärä salasana");
       if (isValid) {
         // Mount Clocking on success
         onSuccess?.(person);
