@@ -28,7 +28,9 @@ contextBridge.exposeInMainWorld('api', {
   deleteStaff: (id) => ipcRenderer.invoke('delete-staff', id),
   // Settings
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
-  setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value)
+  setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value),
+  // Network (proxy fetch via main process to avoid CORS in renderer)
+  fetchRemote: (url, options) => ipcRenderer.invoke('fetch-remote', url, options)
 });
 
 // Synchronous API exposed separately to avoid mixing with Promise-based API

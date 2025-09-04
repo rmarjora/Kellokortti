@@ -9,6 +9,7 @@ import Popup from './components/Popup';
 import AdminLogin from './components/AdminLogin';
 import AddStaff from './components/AddStaff';
 import CurrentTime from './components/CurrentTime';
+import Weather from './components/Weather';
 
 function App() {
   const dispatch = useDispatch();
@@ -157,6 +158,7 @@ function App() {
         </h2>
       )}
       <CurrentTime />
+      <Weather />
       <NameList people={students} supervised={isAdmin} />
   {isAdmin && 
   <div className='admin-panel'>

@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const db = require('./db');
+const https = require('https');
+const http = require('http');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -84,4 +86,51 @@ ipcMain.on('get-setting-sync', (event, key) => {
     console.error('get-setting-sync failed', e);
     event.returnValue = null;
   }
+});
+
+// Simple fetch proxy to bypass CORS and let renderer call remote APIs safely
+ipcMain.handle('fetch-remote', async (event, url, options = {}) => {
+  const doRequest = (targetUrl, redirectsLeft = 3) => new Promise((resolve, reject) => {
+    try {
+      const lib = targetUrl.startsWith('https') ? https : http;
+      const req = lib.request(targetUrl, {
+        method: options.method || 'GET',
+        headers: options.headers || {},
+      }, (res) => {
+        // Handle redirects
+        if ([301,302,303,307,308].includes(res.statusCode)) {
+          const location = res.headers.location;
+          if (location && redirectsLeft > 0) {
+            return resolve(doRequest(location, redirectsLeft - 1));
+          }
+        }
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          resolve({
+            ok: res.statusCode >= 200 && res.statusCode < 300,
+            status: res.statusCode,
+            headers: Object.fromEntries(Object.entries(res.headers).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : v])),
+            body: data
+          });
+        });
+      });
+
+      req.on('error', (err) => reject(err));
+
+      // Timeout
+      req.setTimeout(15000, () => {
+        req.destroy(new Error('Request timed out'));
+      });
+
+      if (options.body) {
+        req.write(typeof options.body === 'string' ? options.body : JSON.stringify(options.body));
+      }
+      req.end();
+    } catch (e) {
+      reject(e);
+    }
+  });
+
+  return doRequest(url);
 });
