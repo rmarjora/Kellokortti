@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-export default defineConfig({
+// Use a function config so we can enable console stripping only for production builds
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   root: './',
   base: './', // ← important for relative asset paths
@@ -13,4 +14,6 @@ export default defineConfig({
       input: path.resolve(__dirname, 'index.html'),
     },
   },
-});
+  // Remove console and debugger statements from production bundles (renderer)
+  esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : undefined,
+}));

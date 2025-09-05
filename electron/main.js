@@ -1,8 +1,20 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const db = require('./db');
 const https = require('https');
 const http = require('http');
+
+// In packaged (production) builds, silence all console output
+if (app.isPackaged) {
+  const noop = () => {};
+  console.log = noop;
+  console.info = noop;
+  console.warn = noop;
+  console.error = noop;
+  console.debug = noop;
+  console.trace = noop;
+}
+
+const db = require('./db');
 
 function createWindow() {
   const win = new BrowserWindow({
