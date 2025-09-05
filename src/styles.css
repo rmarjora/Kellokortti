@@ -47,6 +47,8 @@
 
 html, body, #root {
   height: 100%;
+  /* Prevent page-level scrollbars on the main view */
+  overflow: hidden;
 }
 
 body {
