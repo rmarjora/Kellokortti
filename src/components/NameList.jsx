@@ -70,8 +70,11 @@ const NameList = ({ people, supervised }) => {
 
   // Mathematical layout: compute optimal tile size (2:1 aspect) to fit all names into ~50vh
   const wrapperRef = useRef(null);
+  const blockRef = useRef(null);
   const [tileW, setTileW] = useState(240);
   const [gap, setGap] = useState(14);
+  const statsRef = useRef(null);
+  const [statsPos, setStatsPos] = useState({ top: 0, right: 0 });
 
   useEffect(() => {
     let rafId;
@@ -156,22 +159,67 @@ const NameList = ({ people, supervised }) => {
     };
   }, [people.length]);
 
+  // Count unique arrivals for today
+  const arrivedCount = new Set(arrivals.map(a => a.userId)).size;
+
+  // Position the stats slightly below the list and aligned to the rightmost tile
+  useEffect(() => {
+    const update = () => {
+      const wrapper = wrapperRef.current;
+      const block = blockRef.current;
+      if (!wrapper || !block) return;
+      const tiles = wrapper.querySelectorAll('.clickable-name');
+      if (!tiles || tiles.length === 0) return;
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const blockRect = block.getBoundingClientRect();
+      let maxRight = -Infinity;
+      let maxBottom = -Infinity;
+      tiles.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.right > maxRight) maxRight = r.right;
+        if (r.bottom > maxBottom) maxBottom = r.bottom;
+      });
+      // Position relative to the block container so the stat can extend beyond the wrapper
+      const right = Math.max(0, Math.round(blockRect.right - maxRight));
+      const top = Math.max(0, Math.round(maxBottom - blockRect.top + 6)); // 6px below tiles
+  setStatsPos({ top, right });
+    };
+    update();
+    window.addEventListener('resize', update);
+    const ro = new ResizeObserver(update);
+    if (wrapperRef.current) ro.observe(wrapperRef.current);
+    return () => {
+      window.removeEventListener('resize', update);
+      ro.disconnect();
+    };
+  }, [people.length, tileW, gap]);
+
   return (
       <>
-        <div
-          className="name-list-wrapper"
-          ref={wrapperRef}
-          style={{ '--tileW': `${tileW}px`, '--gap': `${gap}px` }}
-        >
-          <div className="name-list">
-            {people.map((person) => (
-              <ClickableName
-                key={person.id}
-                name={person.name}
-                onClick={() => handleNameClick(person)}
-                hasArrived={arrivals.some(arrival => arrival.userId === person.id)}
-              />
-            ))}
+        <div className="name-list-block" ref={blockRef}>
+          <div
+            className="name-list-wrapper"
+            ref={wrapperRef}
+            style={{ '--tileW': `${tileW}px`, '--gap': `${gap}px` }}
+          >
+            <div className="name-list">
+              {people.toSorted((a, b) => a.name.localeCompare(b.name)).map((person) => (
+                <ClickableName
+                  key={person.id}
+                  name={person.name}
+                  onClick={() => handleNameClick(person)}
+                  hasArrived={arrivals.some(arrival => arrival.userId === person.id)}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Right-aligned arrivals/total stat positioned relative to the block (can overflow wrapper) */}
+          <div
+            className="name-list-stats"
+            ref={statsRef}
+            style={{ top: `${statsPos.top}px`, right: `${statsPos.right}px` }}
+          >
+            <span>Paikalla: {arrivedCount}/{people.length}</span>
           </div>
         </div>
         <Popup open={showPasswordPopup} onClose={handleCancel} exitText='Takaisin'>
