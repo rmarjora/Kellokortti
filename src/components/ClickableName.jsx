@@ -2,7 +2,7 @@ const ClickableName = ({ name, onClick, hasArrived }) => {
   return (
     <div
       className="clickable-name"
-      style={{ background: hasArrived ? '#e0ffe0' : undefined }}
+      style={hasArrived ? { background: '#e0ffe0', color: '#000' } : undefined}
       onClick={onClick}
     >
       {name}

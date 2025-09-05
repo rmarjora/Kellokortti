@@ -22,6 +22,31 @@ const NameList = ({ people, supervised }) => {
     refetchArrivals();
   }, []);
 
+  // Auto-refetch at local midnight and when the window regains focus
+  useEffect(() => {
+    let timerId;
+
+    const scheduleNextMidnight = () => {
+      const now = new Date();
+      const nextMidnight = new Date(now);
+      // Set to next local midnight
+      nextMidnight.setHours(24, 0, 0, 0);
+      const delay = Math.max(0, nextMidnight.getTime() - now.getTime() + 100); // small buffer
+      timerId = setTimeout(() => {
+        refetchArrivals();
+        scheduleNextMidnight(); // schedule again for the following day
+      }, delay);
+    };
+
+    scheduleNextMidnight();
+    window.addEventListener('focus', refetchArrivals);
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+      window.removeEventListener('focus', refetchArrivals);
+    };
+  }, [refetchArrivals]);
+
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showClocking, setShowClocking] = useState(false);

@@ -11,7 +11,7 @@ const CurrentTime = () => {
   }, []);
 
   return (
-    <div style={{ textAlign: "center", fontSize: "1.5rem", color: "#333" }}>
+    <div style={{ textAlign: "center", fontSize: "4rem", color: "var(--text)" }}>
       {time.toLocaleDateString('fi-FI')} {time.toLocaleTimeString('fi-FI')}
     </div>
   );
