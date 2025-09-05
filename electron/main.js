@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const https = require('https');
 const http = require('http');
@@ -20,11 +20,15 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    autoHideMenuBar: true,
+  fullscreen: true,
     webPreferences: {
       contextIsolation: true,
       preload: path.join(app.getAppPath(), 'electron/preload.js')
     }
   });
+
+  Menu.setApplicationMenu(null);
 
   if (process.env.VITE_DEV_SERVER_URL) {
     // Dev mode
