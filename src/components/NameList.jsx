@@ -68,7 +68,7 @@ const NameList = ({ people, supervised }) => {
       setShowClocking(true);
     };
 
-  // Mathematical layout: compute optimal tile size (2:1 aspect) to fit all names into ~60vh
+  // Mathematical layout: compute optimal tile size (2:1 aspect) to fit all names into ~50vh
   const wrapperRef = useRef(null);
   const [tileW, setTileW] = useState(240);
   const [gap, setGap] = useState(14);
@@ -82,8 +82,8 @@ const NameList = ({ people, supervised }) => {
   const padX = parseFloat(styles.paddingLeft || '0') + parseFloat(styles.paddingRight || '0');
   const padY = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');
   const widthAvail = Math.max(0, wrapper.clientWidth - padX);
-  // Use 60% of viewport height as the vertical budget to maximize tile size
-  const heightAvail = Math.max(0, Math.floor(window.innerHeight * 0.6) - padY);
+  // Use 50% of viewport height as the vertical budget to keep the list more compact
+  const heightAvail = Math.max(0, Math.floor(window.innerHeight * 0.5) - padY);
       const n = people.length;
       if (widthAvail <= 0 || heightAvail <= 0 || n === 0) return;
 

@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 let db;
 
 function initDatabase() {
-  const dbPath = path.join(app.getPath('userData'), 'app.db');
+  const dbPath = path.join(app.getPath('userData'), 'app3.db');
   db = new Database(dbPath);
   // Ensure FK constraints are enforced
   db.pragma('foreign_keys = ON');

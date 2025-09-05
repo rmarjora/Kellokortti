@@ -125,7 +125,11 @@ const AdminLogin = ({ onSuccess }) => {
           <button type="submit">{exists ? 'Kirjaudu' : 'Luo salasana'}</button>
         </div>
       </form>
-      <div className="popup-error">{error}</div>
+      {error && (
+        <div className={`popup-error${/väärä salasana/i.test(error) ? ' error-red' : ''}`}>
+          {error}
+        </div>
+      )}
       {info && <div className="badge">{info}</div>}
     </div>
   );

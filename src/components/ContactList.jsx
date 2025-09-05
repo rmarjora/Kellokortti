@@ -29,9 +29,9 @@ const ContactList = ({ isAdmin = false }) => {
   };
 
   const content = status === 'loading' ? <div>Ladataan…</div> : staff.length === 0 ? <p>Henkilökuntaa ei ole</p> : (
-    <div>
+    <div className="contact-list-scroll" role="region" aria-label="Henkilökunnan lista">
       {staff.map((s) => (
-        <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div key={s.id} className="contact-row">
           <Contact staff={s} />
           {isAdmin && (
             <button onClick={() => handleDeleteWarning(s.id)} title="Poista henkilökunnasta">Poista</button>

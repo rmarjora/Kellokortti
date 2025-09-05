@@ -36,7 +36,7 @@ const Clocking = ({ person, onClocked, supervised }) => {
   const list = await window.api.getStaff();
   // Add dummy entries
   // list.push({ id: -2, name: "Krishna "});
-  list.push({ id: -1, name: "Joku muu" });
+  // list.push({ id: -1, name: "Joku muu" });
   console.log("Fetched staff:", list);
         setSupervisors(list);
         setShowSupervisorPicker(true);

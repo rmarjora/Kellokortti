@@ -123,18 +123,18 @@ h1 {
   gap: var(--gap, 14px);
   align-items: flex-start;
   justify-content: center;
-  margin: 2rem;
+  margin: 1rem 1.5rem; /* tighten outer margin to save space */
 }
 
 /* Wrapper to constrain vertical size and allow scale-to-fit */
 .name-list-wrapper {
   position: relative;
-  max-height: 60vh; /* ~60% of viewport height */
+  max-height: 50vh; /* tighten to ~50% of viewport height */
   width: 100%;
   overflow: hidden; /* hide overflow before scaling */
   display: flex;
   justify-content: center;
-  padding: 1rem 2rem 2rem; /* provide outer spacing instead of list margin for accurate measurements */
+  padding: 0.5rem 1.5rem 1.25rem; /* reduced padding to further shrink footprint */
 }
 
 /* When scaled, ensure the container reserves the original space to avoid clipping */
@@ -203,6 +203,27 @@ h1 {
   padding-bottom: 0.5rem;
 }
 
+/* Popup content scrollbar styling (match contact list and table) */
+.popup-content {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(124,58,237,0.7) rgba(255,255,255,0.05); /* thumb track */
+}
+.popup-content::-webkit-scrollbar {
+  width: 10px;
+}
+.popup-content::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+.popup-content::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.45); /* purple */
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.2);
+}
+.popup-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.7);
+}
+
 .popup-input {
   width: 100%;
   padding: 0.6rem 0.75rem;
@@ -219,6 +240,12 @@ h1 {
   gap: 0.5rem;
   justify-content: flex-end;
   margin-top: 0.5rem;
+}
+
+/* Explicit red style for 'Väärä salasana' errors */
+.popup-error.error-red {
+  color: #ef4444; /* same as --danger */
+  font-weight: 700;
 }
 
 button {
@@ -458,6 +485,62 @@ button:active {
   overflow: auto;
   margin: 1rem 0;
   max-height: 45vh; /* keep table compact inside popup */
+}
+
+/* Scrollable contact list to prevent overflow offscreen */
+.contact-list-scroll {
+  overflow-y: auto;
+  max-height: 10vh; /* adjust as needed to fit page layout */
+  padding-right: 0.25rem; /* space for scrollbar without shifting */
+}
+
+/* Optional: nicer narrow scrollbar for dark theme (WebKit + modern browsers) */
+.contact-list-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.contact-list-scroll::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+.contact-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.45); /* purple */
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.2);
+}
+.contact-list-scroll:hover::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.7);
+}
+
+/* Apply the same scrollbar style to ClockingTable's scroll container */
+.table-container {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(124,58,237,0.7) rgba(255,255,255,0.05); /* thumb track */
+}
+.table-container::-webkit-scrollbar {
+  width: 10px;
+}
+.table-container::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+.table-container::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.45); /* purple */
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.2);
+}
+.table-container:hover::-webkit-scrollbar-thumb {
+  background: rgba(124,58,237,0.7);
+}
+
+/* Consistent spacing for contact rows regardless of admin mode */
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0; /* consistent vertical rhythm */
+}
+.contact-row > button {
+  margin: 0; /* avoid extra vertical margin affecting row spacing */
 }
 
 table.data-table {

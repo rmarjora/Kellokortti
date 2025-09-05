@@ -65,7 +65,11 @@ const PersonLogin = ({ person, onSuccess }) => {
   <input ref={inputRef} autoFocus type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 314 }} />
         <button type="submit">Lähetä</button>
       </form>
-      <div className="popup-error">{error}</div>
+      {error && (
+        <div className={`popup-error${/väärä salasana/i.test(error) ? ' error-red' : ''}`}>
+          {error}
+        </div>
+      )}
     </>
   );
 };
