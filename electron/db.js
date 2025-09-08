@@ -56,6 +56,11 @@ function getStaff() {
   return db.prepare('SELECT id, name, email, phone1, phone2 FROM staff').all();
 }
 
+function getStaffList() {
+  // Backwards compatibility alias used by some IPC handlers
+  return getStaff();
+}
+
 function addStaff(staff) {
   const { name, email = null, phone1 = null, phone2 = null } = staff || {};
   const stmt = db.prepare('INSERT INTO staff (name, email, phone1, phone2) VALUES (?, ?, ?, ?)');
@@ -178,9 +183,10 @@ function addArrival(userId, arrivalTime = null) {
   console.log("Existing arrival:", existingArrival);
   if (existingArrival) return null;
 
-  db.prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, NULL)')
+  const info = db
+    .prepare('INSERT INTO arrivalTimes (user_id, arrival_time, supervisor_id) VALUES (?, ?, NULL)')
     .run(userId, arrivalTime);
-  return { id: db.lastInsertRowid, arrivalTime };
+  return { id: info.lastInsertRowid, arrivalTime };
 }
 
 function getArrivals(userId) {
@@ -203,6 +209,13 @@ function setArrivalSupervisor(arrivalId, supervisorId) {
   return info.changes > 0;
 }
 
+function getArrivalSupervisor(arrivalId) {
+  const row = db
+    .prepare('SELECT supervisor_id FROM arrivalTimes WHERE arrival_id = ?')
+    .get(arrivalId);
+  return row ? row.supervisor_id : null;
+}
+
 function getTodaysArrivals() {
   const currentTime = new Date().toISOString();
   return db
@@ -220,9 +233,9 @@ module.exports = {
   getUsers, getUser, getStudents, addUser, deleteUser, clearUsers,
   setSetting, getSetting,
   hasPassword, setPassword, comparePassword, clearPassword,
-  addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getTodaysArrivals,
+  addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getArrivalSupervisor, getTodaysArrivals,
   // Staff
-  getStaff, addStaff, deleteStaff,
+  getStaff, getStaffList, addStaff, deleteStaff,
   // Admin password helpers
   setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword
 };

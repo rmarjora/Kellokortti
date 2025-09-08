@@ -50,11 +50,11 @@ const Clocking = ({ person, onClocked, supervised }) => {
   }
 
   const confirmSupervisor = async () => {
+    console.log("Confirming supervisor:", arrival?.supervisorId);
     try {
       const ok = await window.api.setArrivalSupervisor(arrival.id, arrival.supervisorId);
       if (ok) {
         setMessage('Lupa lisätty');
-        setShowSupervisorPicker(false);
       } else {
         setError('Luvan lisääminen epäonnistui');
       }
@@ -62,6 +62,7 @@ const Clocking = ({ person, onClocked, supervised }) => {
       console.error('Failed to set supervisor', e);
       setError('Luvan lisääminen epäonnistui');
     }
+    setShowSupervisorPicker(false);
   }
 
   const handleClockIn = async () => {
@@ -126,7 +127,7 @@ const Clocking = ({ person, onClocked, supervised }) => {
           <button type="button" onClick={confirmSupervisor}>Tallenna</button>
         </div>
       )}
-      {!showSupervisorPicker && arrival.supervisorId != null && <p className="clocking-message">Lupa lisätty</p>}
+      {!showSupervisorPicker && arrival.supervisorId && <p className="badge">Lupa lisätty</p>}
     </div>
   );
 }
