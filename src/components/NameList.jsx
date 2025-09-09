@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, use } from 'react';
 import ClickableName from "./ClickableName";
 import Popup from "./Popup";
 import PersonLogin from "./PersonLogin";
@@ -50,20 +50,30 @@ const NameList = ({ people, supervised }) => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showClocking, setShowClocking] = useState(false);
+  const [viaKeycard, setViaKeycard] = useState(false);
 
   // Allow external trigger (e.g., keycard scan) to open user panel on homepage
   useEffect(() => {
-    const onOpenFromScan = (e) => {
-      const person = e?.detail;
-      if (!person) return;
-      setSelectedPerson(person);
-      // In non-admin mode, open password popup first; admin mode handled by parent
-      setShowClocking(true);
-      setShowPasswordPopup(false);
-    };
-    window.addEventListener('open-user-panel', onOpenFromScan);
-    return () => window.removeEventListener('open-user-panel', onOpenFromScan);
-  }, []);
+    if (supervised) return; // Disabled in supervised mode
+    const keycardListener = window.api.onKeycardScanned(async (payload) => {
+      const uid = typeof payload === 'string' ? payload : payload?.uid;
+      if (!uid) return;
+      try {
+        const person = await window.api.getUserByCardUid(uid);
+        if (person) {
+          setSelectedPerson(person);
+          setViaKeycard(true);
+          supervised ? setShowClocking(true) : setShowClocking(true);
+        }
+      } catch (e) {
+        console.error('getUserByCardUid failed', e);
+      }
+    });
+    }, []);
+
+    useEffect(() => {
+      setViaKeycard(false);
+    }, [showClocking, showPasswordPopup, selectedPerson]);
 
     const handleNameClick = (person) => {
       console.log('Clicked person:', person);
@@ -245,6 +255,7 @@ const NameList = ({ people, supervised }) => {
             person={selectedPerson}
             onClocked={refetchArrivals}
             supervised={supervised}
+            viaKeycard={viaKeycard}
           />
           <Options user={selectedPerson} supervised={supervised} onDeleted={handleCancel} />
         </Popup>

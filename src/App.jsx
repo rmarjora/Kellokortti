@@ -33,27 +33,6 @@ function App() {
     dispatch(fetchStudents());
   }, [dispatch]);
 
-  // Global keycard scan handling on homepage in non-admin mode
-  useEffect(() => {
-    let unsub;
-    if (!isAdmin) {
-      unsub = window.api.onKeycardScanned(async (payload) => {
-        const uid = typeof payload === 'string' ? payload : payload?.uid;
-        if (!uid) return;
-        try {
-          const person = await window.api.getUserByCardUid(uid);
-          if (person) {
-            // Fire a DOM event that NameList listens to
-            window.dispatchEvent(new CustomEvent('open-user-panel', { detail: person }));
-          }
-        } catch (e) {
-          console.error('getUserByCardUid failed', e);
-        }
-      });
-    }
-    return () => { if (unsub) { try { unsub(); } catch (_) {} } };
-  }, [isAdmin]);
-
   // Load title and subtitle from settings
   useEffect(() => {
     let mounted = true;

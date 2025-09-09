@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAllowedLateMinutes } from "../config.js";
 import { getLateMinutes } from '../utils.js';
 
-const Clocking = ({ person, onClocked, supervised }) => {
+const Clocking = ({ person, onClocked, supervised, viaKeycard }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [arrival, setArrival] = useState(undefined);
@@ -10,13 +10,34 @@ const Clocking = ({ person, onClocked, supervised }) => {
   const [supervisors, setSupervisors] = useState([]);
   const allowedLateMinutes = getAllowedLateMinutes();
 
+  // Stable clock-in handler to avoid stale closures in effects
+  const handleClockIn = useCallback(async () => {
+    setMessage("");
+    setError("");
+    const currentTime = new Date().toISOString();
+    console.log("Clocking in at:", currentTime);
+    const newArrival = await window.api.addArrival(person.id, currentTime);
+    setArrival(newArrival);
+    onClocked(newArrival);
+  }, [person?.id, onClocked]);
+
   useEffect(() => {
     const fetchArrival = async () => {
       const a = await window.api.getArrivalToday(person.id);
       setArrival(a);
+      console.log("Fetched today's arrival for user", person.id, a);
+      console.log("supervised:", supervised, "viaKeycard:", viaKeycard, "arrival:", a);
     };
     fetchArrival();
   }, [person?.id]);
+
+  // Auto clock-in via keycard after arrival has been fetched
+  useEffect(() => {
+    if (viaKeycard && arrival === null) {
+      console.log("Clocking in via keycard for user", person.id);
+      handleClockIn();
+    }
+  }, [viaKeycard, arrival, handleClockIn, person?.id]);
 
   const lateMinutes = getLateMinutes(arrival?.arrivalTime);
   const timeClass = lateMinutes <= 0
@@ -65,22 +86,15 @@ const Clocking = ({ person, onClocked, supervised }) => {
     setShowSupervisorPicker(false);
   }
 
-  const handleClockIn = async () => {
-    setMessage("");
-    setError("");
-    const currentTime = new Date().toISOString();
-    console.log("Clocking in at:", currentTime);
-    const newArrival = await window.api.addArrival(person.id, currentTime);
-    setArrival(newArrival);
-    onClocked(newArrival)
-  };
+  // Manual clock-in uses the same stable handler
+  const manualClockIn = handleClockIn;
 
   if (arrival === undefined) {
     return <h2>Loading…</h2>;
   }
 
   if (arrival === null && !supervised) {
-    return <button onClick={handleClockIn}>Kellota saapuminen</button>;
+    return <button onClick={manualClockIn}>Kellota saapuminen</button>;
   }
 
   if (arrival === null) {
