@@ -22,6 +22,10 @@ const KeycardsList = ({ user }) => {
 
 		// Cleanup any listener on unmount
 		return () => {
+			// Clear capture flag if we unmount mid-flow
+			if (typeof window !== 'undefined') {
+				window.__keycardCaptureActive = false;
+			}
 			if (keycardUnsubRef.current) {
 				try { keycardUnsubRef.current(); } catch (_) {}
 				keycardUnsubRef.current = null;
@@ -39,6 +43,10 @@ const KeycardsList = ({ user }) => {
 		}
 
 		setShowScanPopup(true);
+		// Signal that we are capturing the next keycard exclusively
+		if (typeof window !== 'undefined') {
+			window.__keycardCaptureActive = true;
+		}
 		console.log('Waiting for keycard scan...');
 		const unsubscribe = window.api.onKeycardScanned(async (payload) => {
 			const uid = typeof payload === 'string' ? payload : payload?.uid;
@@ -61,6 +69,9 @@ const KeycardsList = ({ user }) => {
 				console.error('Failed to add keycard:', e);
 			} finally {
 				setShowScanPopup(false);
+				if (typeof window !== 'undefined') {
+					window.__keycardCaptureActive = false;
+				}
 				if (keycardUnsubRef.current) {
 					try { keycardUnsubRef.current(); } catch (_) {}
 					keycardUnsubRef.current = null;
@@ -78,6 +89,9 @@ const KeycardsList = ({ user }) => {
 
 	const handleCancel = () => {
 		setShowScanPopup(false);
+		if (typeof window !== 'undefined') {
+			window.__keycardCaptureActive = false;
+		}
 		if (keycardUnsubRef.current) {
 			try { keycardUnsubRef.current(); } catch (_) {}
 			keycardUnsubRef.current = null;

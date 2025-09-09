@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef, use } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import ClickableName from "./ClickableName";
 import Popup from "./Popup";
 import PersonLogin from "./PersonLogin";
@@ -55,8 +55,12 @@ const NameList = ({ people, supervised }) => {
 
   // Allow external trigger (e.g., keycard scan) to open user panel on homepage
   useEffect(() => {
-    if (supervised) return; // Disabled in supervised mode
-    const keycardListener = window.api.onKeycardScanned(async (payload) => {
+    // Only listen for keycards in unsupervised mode
+    if (supervised) return;
+
+    const unsubscribe = window.api.onKeycardScanned(async (payload) => {
+      // Ignore scans while another component is capturing a keycard (e.g., add keycard flow)
+      if (typeof window !== 'undefined' && window.__keycardCaptureActive) return;
       const uid = typeof payload === 'string' ? payload : payload?.uid;
       if (!uid) return;
       try {
@@ -64,14 +68,15 @@ const NameList = ({ people, supervised }) => {
         if (person) {
           setSelectedPerson(person);
           setViaKeycard(true);
-          supervised ? setShowClocking(true) : setShowClocking(true);
+          setShowClocking(true); // bypass password when coming from keycard in unsupervised mode
         }
       } catch (e) {
         console.error('getUserByCardUid failed', e);
       }
     });
+
     return () => {
-      try { keycardListener?.unsubscribe?.(); } catch (_) {}
+      try { if (typeof unsubscribe === 'function') unsubscribe(); } catch (_) {}
     };
   }, [supervised]);
 
