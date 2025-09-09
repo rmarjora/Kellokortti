@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getAllowedLateMinutes } from "../config.js";
 import { getLateMinutes } from '../utils.js';
 
-const Clocking = ({ person, onClocked, supervised, viaKeycard }) => {
+const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [arrival, setArrival] = useState(undefined);
@@ -19,6 +19,7 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard }) => {
     const newArrival = await window.api.addArrival(person.id, currentTime);
     setArrival(newArrival);
     onClocked(newArrival);
+    return newArrival;
   }, [person?.id, onClocked]);
 
   useEffect(() => {
@@ -31,13 +32,29 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard }) => {
     fetchArrival();
   }, [person?.id]);
 
+  // Latch whether this instance was opened via keycard to avoid race conditions
+  const viaKeycardRef = useRef(!!viaKeycard);
+  useEffect(() => {
+    if (viaKeycard) viaKeycardRef.current = true;
+  }, [viaKeycard]);
+
   // Auto clock-in via keycard after arrival has been fetched
   useEffect(() => {
-    if (viaKeycard && arrival === null) {
+    if (viaKeycardRef.current && arrival === null) {
       console.log("Clocking in via keycard for user", person.id);
-      handleClockIn();
+      (async () => {
+        try {
+          const a = await handleClockIn();
+          // Notify parent specifically for auto clock-ins (keycard)
+          onAutoClocked?.(a);
+          // Ensure we only auto-clock once per mount
+          viaKeycardRef.current = false;
+        } catch (e) {
+          console.error('Auto clock-in failed', e);
+        }
+      })();
     }
-  }, [viaKeycard, arrival, handleClockIn, person?.id]);
+  }, [arrival, handleClockIn, person?.id, onAutoClocked]);
 
   const lateMinutes = getLateMinutes(arrival?.arrivalTime);
   const timeClass = lateMinutes <= 0
@@ -55,9 +72,6 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard }) => {
       if (!showSupervisorPicker) {
         // Lazy-load staff when opening the picker
   const list = await window.api.getStaff();
-  // Add dummy entries
-  // list.push({ id: -2, name: "Krishna "});
-  // list.push({ id: -1, name: "Joku muu" });
   console.log("Fetched staff:", list);
         setSupervisors(list);
         setShowSupervisorPicker(true);

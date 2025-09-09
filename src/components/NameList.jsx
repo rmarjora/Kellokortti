@@ -51,6 +51,7 @@ const NameList = ({ people, supervised }) => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showClocking, setShowClocking] = useState(false);
   const [viaKeycard, setViaKeycard] = useState(false);
+  const autoCloseTimerRef = useRef(null);
 
   // Allow external trigger (e.g., keycard scan) to open user panel on homepage
   useEffect(() => {
@@ -69,11 +70,15 @@ const NameList = ({ people, supervised }) => {
         console.error('getUserByCardUid failed', e);
       }
     });
-    }, []);
+    return () => {
+      try { keycardListener?.unsubscribe?.(); } catch (_) {}
+    };
+  }, [supervised]);
 
+    // Reset viaKeycard only when the Clocking popup fully closes
     useEffect(() => {
-      setViaKeycard(false);
-    }, [showClocking, showPasswordPopup, selectedPerson]);
+      if (!showClocking) setViaKeycard(false);
+    }, [showClocking]);
 
     const handleNameClick = (person) => {
       console.log('Clicked person:', person);
@@ -82,6 +87,10 @@ const NameList = ({ people, supervised }) => {
     };
 
     const handleCancel = () => {
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current);
+        autoCloseTimerRef.current = null;
+      }
       setShowPasswordPopup(false);
       setShowClocking(false);
       setSelectedPerson(null);
@@ -218,6 +227,35 @@ const NameList = ({ people, supervised }) => {
     };
   }, [people.length, tileW, gap]);
 
+  // Auto-close after auto keycard clock-in; cancel on interactions
+  const handleAutoClocked = useCallback(() => {
+    if (autoCloseTimerRef.current) {
+      clearTimeout(autoCloseTimerRef.current);
+    }
+    autoCloseTimerRef.current = setTimeout(() => {
+      // Close the popup if still open
+      if (showClocking) handleCancel();
+    }, 5000);
+  }, [showClocking]);
+
+  // Cancel auto-close if user clicks any button inside the Clocking popup
+  const clockingContainerRef = useRef(null);
+  useEffect(() => {
+    const el = clockingContainerRef.current;
+    if (!el) return;
+    const onAnyButton = (e) => {
+      const target = e.target;
+      if (target && target.closest('button')) {
+        if (autoCloseTimerRef.current) {
+          clearTimeout(autoCloseTimerRef.current);
+          autoCloseTimerRef.current = null;
+        }
+      }
+    };
+    el.addEventListener('click', onAnyButton);
+    return () => el.removeEventListener('click', onAnyButton);
+  }, [showClocking]);
+
   return (
       <>
         <div className="name-list-block" ref={blockRef}>
@@ -251,13 +289,16 @@ const NameList = ({ people, supervised }) => {
         </Popup>
         <Popup open={showClocking} onClose={handleCancel} exitText= {supervised ? 'Takaisin' : 'Kirjaudu ulos'}>
           <h3>{selectedPerson?.name}</h3>
-          <Clocking
-            person={selectedPerson}
-            onClocked={refetchArrivals}
-            supervised={supervised}
-            viaKeycard={viaKeycard}
-          />
-          <Options user={selectedPerson} supervised={supervised} onDeleted={handleCancel} />
+          <div ref={clockingContainerRef}>
+            <Clocking
+              person={selectedPerson}
+              onClocked={refetchArrivals}
+              supervised={supervised}
+              viaKeycard={viaKeycard}
+              onAutoClocked={handleAutoClocked}
+            />
+            <Options user={selectedPerson} supervised={supervised} onDeleted={handleCancel} />
+          </div>
         </Popup>
       </>
     );
