@@ -51,6 +51,20 @@ const NameList = ({ people, supervised }) => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showClocking, setShowClocking] = useState(false);
 
+  // Allow external trigger (e.g., keycard scan) to open user panel on homepage
+  useEffect(() => {
+    const onOpenFromScan = (e) => {
+      const person = e?.detail;
+      if (!person) return;
+      setSelectedPerson(person);
+      // In non-admin mode, open password popup first; admin mode handled by parent
+      setShowClocking(true);
+      setShowPasswordPopup(false);
+    };
+    window.addEventListener('open-user-panel', onOpenFromScan);
+    return () => window.removeEventListener('open-user-panel', onOpenFromScan);
+  }, []);
+
     const handleNameClick = (person) => {
       console.log('Clicked person:', person);
       setSelectedPerson(person);

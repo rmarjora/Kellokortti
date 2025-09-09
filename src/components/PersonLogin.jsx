@@ -66,7 +66,7 @@ const PersonLogin = ({ person, onSuccess }) => {
         <button type="submit">Lähetä</button>
       </form>
       {error && (
-        <div className={`popup-error${/väärä salasana/i.test(error) ? ' error-red' : ''}`}>
+        <div className={`popup-error error-red`}>
           {error}
         </div>
       )}

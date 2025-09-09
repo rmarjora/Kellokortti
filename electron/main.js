@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const express = require('express');
+const createKeycardRouter = require('./keycards');
 
 // In packaged (production) builds, silence all console output
 if (app.isPackaged) {
@@ -15,6 +17,13 @@ if (app.isPackaged) {
 }
 
 const db = require('./db');
+
+// Hold a reference to the main BrowserWindow
+let mainWindow = null;
+
+function getMainWindow() {
+  return mainWindow;
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -39,7 +48,22 @@ function createWindow() {
     const indexPath = path.join(app.getAppPath(), 'dist/index.html');
     win.loadFile(indexPath);
   }
+  mainWindow = win;
+
+  win.on('closed', () => {
+    mainWindow = null;
+  });
 }
+
+// Start server
+const server = express();
+server.use(express.json());
+// Attach router later after window is created so it can send events
+server.use('/keycards', createKeycardRouter(getMainWindow));
+const port = 5000;
+server.listen(port, () => {
+  console.log(`Keycard server listening at http://localhost:${port}`);
+});
 
 app.whenReady().then(() => {
   db.initDatabase();
@@ -80,6 +104,10 @@ ipcMain.handle('has-password', (event, userId) => db.hasPassword(userId));
 ipcMain.handle('set-password', (event, userId, password) => db.setPassword(userId, password));
 ipcMain.handle('compare-password', (event, userId, password) => db.comparePassword(userId, password));
 ipcMain.handle('clear-password', (event, userId) => db.clearPassword(userId));
+ipcMain.handle('get-user-by-card-uid', (event, uid) => db.getUserByCardUid(uid));
+ipcMain.handle('get-cards', (event, userId) => db.getCards(userId));
+ipcMain.handle('add-card', (event, userId, uid) => db.addCard(userId, uid));
+ipcMain.handle('delete-card', (event, cardId) => db.deleteCard(cardId));
 ipcMain.handle('add-arrival', (event, userId, arrivalTime) => db.addArrival(userId, arrivalTime));
 ipcMain.handle('get-arrival-today', (event, userId) => db.getArrivalToday(userId));
 ipcMain.handle('get-arrivals', (event, userId) => db.getArrivals(userId));

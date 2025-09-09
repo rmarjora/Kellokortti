@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 let db;
 
 function initDatabase() {
-  const dbPath = path.join(app.getPath('userData'), 'app.db');
+  const dbPath = path.join(app.getPath('userData'), 'app2.db');
   db = new Database(dbPath);
   // Ensure FK constraints are enforced
   db.pragma('foreign_keys = ON');
@@ -32,6 +32,12 @@ function initDatabase() {
     user_id INTEGER NOT NULL,
     arrival_time DATETIME NOT NULL,
     supervisor_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`)
+  db.exec(`CREATE TABLE IF NOT EXISTS keycards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    uid TEXT NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`)
   db.exec(`CREATE TABLE IF NOT EXISTS adminPasswordHashes (
@@ -161,6 +167,37 @@ function clearPassword(userId) {
   db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
 }
 
+function getUserByCardUid(uid) {
+  const row = db.prepare(`SELECT u.id, u.name FROM users u
+    JOIN keycards k ON u.id = k.user_id
+    WHERE k.uid = ?`).get(uid);
+  return row ? { id: row.id, name: row.name } : null;
+}
+
+function getCards(userId) {
+  return db.prepare('SELECT id, uid FROM keycards WHERE user_id = ?').all(userId);
+}
+
+function addCard(userId, uid) {
+  try {
+    const info = db.prepare('INSERT INTO keycards (user_id, uid) VALUES (?, ?)').run(userId, uid);
+    return { id: info.lastInsertRowid, uid };
+  } catch (e) {
+    console.error('addCard failed', e);
+    return null;
+  }
+}
+
+function deleteCard(cardId) {
+  try {
+    const info = db.prepare('DELETE FROM keycards WHERE id = ?').run(cardId);
+    return info.changes > 0;
+  } catch (e) {
+    console.error('deleteCard failed', e);
+    return false;
+  }
+}
+
 function getArrivalToday(userId) {
   const currentTime = new Date().toISOString();
   const row = db
@@ -232,7 +269,11 @@ module.exports = {
   initDatabase,
   getUsers, getUser, getStudents, addUser, deleteUser, clearUsers,
   setSetting, getSetting,
+  // Passwords
   hasPassword, setPassword, comparePassword, clearPassword,
+  // Keycards
+  getUserByCardUid, getCards, addCard, deleteCard,
+  // Arrivals
   addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getArrivalSupervisor, getTodaysArrivals,
   // Staff
   getStaff, getStaffList, addStaff, deleteStaff,

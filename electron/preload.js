@@ -11,10 +11,17 @@ contextBridge.exposeInMainWorld('api', {
   addUser: (user) => ipcRenderer.invoke('add-user', user),
   deleteUser: (userId) => ipcRenderer.invoke('delete-user', userId),
   clearUsers: () => ipcRenderer.invoke('clear-users'),
+  // Passwords
   hasPassword: (userId) => ipcRenderer.invoke('has-password', userId),
   setPassword: (userId, password) => ipcRenderer.invoke('set-password', userId, password),
   comparePassword: (userId, password) => ipcRenderer.invoke('compare-password', userId, password),
   clearPassword: (userId) => ipcRenderer.invoke('clear-password', userId),
+  // Keycards
+  getUserByCardUid: (uid) => ipcRenderer.invoke('get-user-by-card-uid', uid),
+  getCards: (userId) => ipcRenderer.invoke('get-cards', userId),
+  addCard: (userId, uid) => ipcRenderer.invoke('add-card', userId, uid),
+  deleteCard: (cardId) => ipcRenderer.invoke('delete-card', cardId),
+  // Arrivals
   addArrival: (userId, arrivalTime) => ipcRenderer.invoke('add-arrival', userId, arrivalTime),
   getArrivalToday: (userId) => ipcRenderer.invoke('get-arrival-today', userId),
   getArrivals: (userId) => ipcRenderer.invoke('get-arrivals', userId),
@@ -22,6 +29,7 @@ contextBridge.exposeInMainWorld('api', {
   setArrivalSupervisor: (arrivalId, supervisorId) => ipcRenderer.invoke('set-arrival-supervisor', arrivalId, supervisorId),
   clearAllArrivals: () => ipcRenderer.invoke('clear-all-arrivals'),
   getTodaysArrivals: () => ipcRenderer.invoke('get-todays-arrivals'),
+  // Staff
   getStaffList: () => ipcRenderer.invoke('get-staff-list'),
   getStaff: () => ipcRenderer.invoke('get-staff'),
   addStaff: (staff) => ipcRenderer.invoke('add-staff', staff),
@@ -30,7 +38,14 @@ contextBridge.exposeInMainWorld('api', {
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
   setSetting: (key, value) => ipcRenderer.invoke('set-setting', key, value),
   // Network (proxy fetch via main process to avoid CORS in renderer)
-  fetchRemote: (url, options) => ipcRenderer.invoke('fetch-remote', url, options)
+  fetchRemote: (url, options) => ipcRenderer.invoke('fetch-remote', url, options),
+  // Events
+  onKeycardScanned: (cb) => {
+    // Returns an unsubscribe function
+    const listener = (event, payload) => cb(payload);
+    ipcRenderer.on('keycard-scanned', listener);
+    return () => ipcRenderer.removeListener('keycard-scanned', listener);
+  }
 });
 
 // Synchronous API exposed separately to avoid mixing with Promise-based API

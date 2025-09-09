@@ -1,0 +1,10 @@
+# Base URL for requests in this file
+@baseUrl = http://localhost:5000
+
+### POST /
+POST {{baseUrl}}/
+Accept: application/json
+Content-Type: application/json
+{
+  "uid": "04A224B3C1"  // Replace with actual UID read from the keycard reader
+}
