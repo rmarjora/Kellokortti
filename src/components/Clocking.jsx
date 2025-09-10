@@ -112,7 +112,12 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
   }
 
   if (arrival === null) {
-    return <p>Ei ole saapunut tänään</p>
+    return (
+      <>
+        <p>Ei ole saapunut tänään</p>
+        <button onClick={manualClockIn}>Kellota saapuminen</button>
+      </>
+    );
   }
 
   if (lateMinutes <= allowedLateMinutes) {
@@ -132,7 +137,7 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
         <p>
           Kellotettu ajassa <span className={timeClass}>{new Date(arrival.arrivalTime).toLocaleTimeString()}</span>
         </p>
-        {!showSupervisorPicker && !supervised && <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>}
+        {!showSupervisorPicker && <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>}
         {showSupervisorPicker && (
         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <label>
