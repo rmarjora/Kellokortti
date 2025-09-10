@@ -8,6 +8,14 @@ const KeycardsList = ({ user }) => {
 	const [error, setError] = useState("");
 	const keycardUnsubRef = useRef(null);
 
+	// Mask all but the last 4 characters of the UID
+	const maskUid = (uid) => {
+		if (!uid && uid !== 0) return "";
+		const s = String(uid);
+		if (s.length <= 4) return s;
+		return "*".repeat(s.length - 4) + s.slice(-4);
+	};
+
 	useEffect(() => {
 		const fetchKeycards = async () => {
 			try {
@@ -106,7 +114,7 @@ const KeycardsList = ({ user }) => {
 				<ul>
 					{keycards.map((keycard) => (
 						<li key={keycard.id}>
-							{keycard.uid} <button onClick={() => removeKeycard(keycard.id)}>Poista</button>
+							{maskUid(keycard.uid)} <button onClick={() => removeKeycard(keycard.id)}>Poista</button>
 						</li>
 					))}
 				</ul>
