@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getAllowedLateMinutes } from "../config.js";
 import { getLateMinutes } from '../utils.js';
+import applePaySfx from '../assets/apple_pay.mp3';
 
 const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) => {
   const [message, setMessage] = useState("");
@@ -10,17 +11,43 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
   const [supervisors, setSupervisors] = useState([]);
   const allowedLateMinutes = getAllowedLateMinutes();
 
+  // Preload sound effect once to avoid latency and path issues
+  const sfxRef = useRef(null);
+  useEffect(() => {
+    const a = new Audio(applePaySfx);
+    a.preload = 'auto';
+    // adjust if needed
+    // a.volume = 0.9;
+    sfxRef.current = a;
+    return () => {
+      try { a.pause(); } catch { /* noop */ }
+      sfxRef.current = null;
+    };
+  }, []);
+
+  const playSfx = useCallback(() => {
+    const a = sfxRef.current;
+    if (!a) return;
+    // rewind to start so repeated plays work
+    a.currentTime = 0;
+    a.play().catch(() => {
+      // Ignore autoplay/gesture restrictions; Electron usually allows it
+    });
+  }, []);
+
   // Stable clock-in handler to avoid stale closures in effects
   const handleClockIn = useCallback(async () => {
     setMessage("");
     setError("");
     const currentTime = new Date().toISOString();
     console.log("Clocking in at:", currentTime);
+    // Play sound effect
+    playSfx();
     const newArrival = await window.api.addArrival(person.id, currentTime);
     setArrival(newArrival);
     onClocked(newArrival);
     return newArrival;
-  }, [person?.id, onClocked]);
+  }, [person?.id, onClocked, playSfx]);
 
   useEffect(() => {
     const fetchArrival = async () => {
