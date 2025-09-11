@@ -3,7 +3,7 @@ import { getAllowedLateMinutes } from "../config.js";
 import { getLateMinutes } from '../utils.js';
 import applePaySfx from '../assets/apple_pay.mp3';
 
-const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) => {
+const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked, suppressChime }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [arrival, setArrival] = useState(undefined);
@@ -41,13 +41,15 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
     setError("");
     const currentTime = new Date().toISOString();
     console.log("Clocking in at:", currentTime);
-    // Play sound effect
-    playSfx();
+    // Play sound effect unless the parent asked us to suppress it
+    if (!suppressChime) {
+      playSfx();
+    }
     const newArrival = await window.api.addArrival(person.id, currentTime);
     setArrival(newArrival);
     onClocked(newArrival);
     return newArrival;
-  }, [person?.id, onClocked, playSfx]);
+  }, [person?.id, onClocked, playSfx, suppressChime]);
 
   useEffect(() => {
     const fetchArrival = async () => {
@@ -131,7 +133,7 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
   const manualClockIn = handleClockIn;
 
   if (arrival === undefined) {
-    return <h2>Loading…</h2>;
+    return <h2>Ladataan…</h2>;
   }
 
   if (arrival === null && !supervised) {
@@ -160,8 +162,8 @@ const Clocking = ({ person, onClocked, supervised, viaKeycard, onAutoClocked }) 
   } else {
     return (
       <div>
-        <p>Myöhässä</p>
-        <p>
+        <p style={{ fontSize: '22px', margin: '0.5rem 0.2rem' }}>Myöhässä</p>
+        <p style={{ fontSize: '30px', margin: '0.2rem 0.2rem' }}>
           Kellotettu ajassa <span className={timeClass}>{new Date(arrival.arrivalTime).toLocaleTimeString()}</span>
         </p>
         {!showSupervisorPicker && <button type="button" onClick={handleLateArrival}>Luvallinen myöhästyminen</button>}

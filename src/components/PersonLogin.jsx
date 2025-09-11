@@ -86,7 +86,7 @@ const PersonLogin = ({ person, onSuccess }) => {
     <>
       <h3>{hasPassword ? `Syötä salasana henkilölle ${person.name}` : `Luo salasana henkilölle ${person.name}`}</h3>
   <form onSubmit={handleSubmit} className="popup-form">
-  <input ref={inputRef} autoFocus type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 314 }} />
+  <input ref={inputRef} autoFocus type="password" onChange={password.onChange} value={password.value} className="popup-input" style={{ width: 432 }} />
         <button type="submit">Lähetä</button>
       </form>
       {error && (

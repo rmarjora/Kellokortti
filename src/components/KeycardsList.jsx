@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Popup from "./Popup";
+import applePaySfx from '../assets/apple_pay.mp3';
+import xpErrorSfx from "../assets/windows_xp_error.mp3";
 
 const KeycardsList = ({ user }) => {
 	const [keycards, setKeycards] = useState([]);
@@ -7,6 +9,28 @@ const KeycardsList = ({ user }) => {
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
 	const keycardUnsubRef = useRef(null);
+	const sfxRef = useRef(null);
+	const errorSfxRef = useRef(null);
+
+	// Preload confirm sound
+	useEffect(() => {
+		const a = new Audio(applePaySfx);
+		a.preload = 'auto';
+		sfxRef.current = a;
+		// Preload error sound too
+		const e = new Audio(xpErrorSfx);
+		e.preload = 'auto';
+		errorSfxRef.current = e;
+		return () => { try { a.pause(); } catch {} sfxRef.current = null; try { e.pause(); } catch {} errorSfxRef.current = null; };
+	}, []);
+
+	const playChime = useCallback(() => {
+		const a = sfxRef.current; if (!a) return; a.currentTime = 0; a.play().catch(() => {});
+	}, []);
+
+	const playError = useCallback(() => {
+		const a = errorSfxRef.current; if (!a) return; a.currentTime = 0; a.play().catch(() => {});
+	}, []);
 
 	// Mask all but the last 4 characters of the UID
 	const maskUid = (uid) => {
@@ -69,12 +93,20 @@ const KeycardsList = ({ user }) => {
 				if (newCard) {
 					setKeycards((prev) => [...prev, newCard]);
 					setMessage("Avain lisätty");
+					// Play confirmation sound on successful add
+					playChime();
 				} else {
 					console.error("Failed to add keycard");
 					setError("Tämä avain on jo käytössä");
+					playError();
 				}
 			} catch (e) {
 				console.error('Failed to add keycard:', e);
+				const msg = String(e?.message || e).toLowerCase();
+				if (msg.includes('duplicate') || msg.includes('already')) {
+					setError("Tämä avain on jo käytössä");
+					playError();
+				}
 			} finally {
 				setShowScanPopup(false);
 				if (typeof window !== 'undefined') {

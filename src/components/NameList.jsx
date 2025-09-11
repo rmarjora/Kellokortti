@@ -4,6 +4,7 @@ import Popup from "./Popup";
 import PersonLogin from "./PersonLogin";
 import Clocking from "./Clocking";
 import Options from './Options';
+import applePaySfx from '../assets/apple_pay.mp3';
 
 const NameList = ({ people, supervised }) => {
   if (people.length === 0) {
@@ -53,12 +54,30 @@ const NameList = ({ people, supervised }) => {
   const [viaKeycard, setViaKeycard] = useState(false);
   const autoCloseTimerRef = useRef(null);
 
+  // Preload Apple Pay sound and provide a small helper to play it
+  const sfxRef = useRef(null);
+  useEffect(() => {
+    const a = new Audio(applePaySfx);
+    a.preload = 'auto';
+    sfxRef.current = a;
+    return () => {
+      try { a.pause(); } catch { /* noop */ }
+      sfxRef.current = null;
+    };
+  }, []);
+  const playChime = useCallback(() => {
+    const a = sfxRef.current;
+    if (!a) return;
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  }, []);
+
   // Allow external trigger (e.g., keycard scan) to open user panel on homepage
   useEffect(() => {
     // Only listen for keycards in unsupervised mode
     if (supervised) return;
 
-    const unsubscribe = window.api.onKeycardScanned(async (payload) => {
+  const unsubscribe = window.api.onKeycardScanned(async (payload) => {
       // Ignore scans while another component is capturing a keycard (e.g., add keycard flow)
       if (typeof window !== 'undefined' && window.__keycardCaptureActive) return;
       const uid = typeof payload === 'string' ? payload : payload?.uid;
@@ -66,6 +85,8 @@ const NameList = ({ people, supervised }) => {
       try {
         const person = await window.api.getUserByCardUid(uid);
         if (person) {
+      // Successful recognition -> play chime
+      playChime();
           setSelectedPerson(person);
           setViaKeycard(true);
           setShowClocking(true); // bypass password when coming from keycard in unsupervised mode
@@ -301,6 +322,7 @@ const NameList = ({ people, supervised }) => {
               supervised={supervised}
               viaKeycard={viaKeycard}
               onAutoClocked={handleAutoClocked}
+              suppressChime={viaKeycard}
             />
             <Options user={selectedPerson} supervised={supervised} onDeleted={handleCancel} />
           </div>
