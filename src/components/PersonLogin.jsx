@@ -1,11 +1,32 @@
 import useField from "../hooks/useField";
 import { useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
+import xpErrorSfx from "../assets/windows_xp_error.mp3";
 
 const PersonLogin = ({ person, onSuccess }) => {
   const password = useField();
   const [hasPassword, setHasPassword] = useState(undefined);
   const [error, setError] = useState("");
   const inputRef = useRef(null);
+  const sfxRef = useRef(null);
+
+  // Preload error sound once
+  useEffect(() => {
+    const a = new Audio(xpErrorSfx);
+    a.preload = 'auto';
+    sfxRef.current = a;
+    return () => {
+      try { a.pause(); } catch { /* noop */ }
+      sfxRef.current = null;
+    };
+  }, []);
+
+  const playError = useCallback(() => {
+    const a = sfxRef.current;
+    if (!a) return;
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  }, []);
 
   if (!person) return <h2>Something went wrong</h2>;
 
@@ -51,6 +72,9 @@ const PersonLogin = ({ person, onSuccess }) => {
       // Verify existing password
       const isValid = await window.api.comparePassword(person.id, password.value);
       setError(isValid ? "" : "Väärä salasana");
+      if (!isValid) {
+        playError();
+      }
       if (isValid) {
         // Mount Clocking on success
         onSuccess?.(person);
