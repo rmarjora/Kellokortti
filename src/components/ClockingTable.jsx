@@ -63,11 +63,17 @@ const ClockingTable = ({ user, startDate, endDate }) => {
   if (startDate) {
     const cursor = new Date(startDate);
     cursor.setHours(0,0,0,0);
-    // Always clone endDate before mutating
     let effectiveEnd = endDate ? new Date(endDate) : null;
     if (effectiveEnd) effectiveEnd.setHours(0,0,0,0);
-    // Exclude today unless already clocked in today
-    if (!hasTodayArrival && effectiveEnd) {
+    // Only exclude today if today is within the range and not clocked in
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (
+      effectiveEnd &&
+      today.getTime() >= cursor.getTime() &&
+      today.getTime() <= effectiveEnd.getTime() &&
+      !hasTodayArrival
+    ) {
       effectiveEnd.setDate(effectiveEnd.getDate() - 1);
     }
     while (effectiveEnd && cursor <= effectiveEnd) {
