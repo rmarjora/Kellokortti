@@ -1,5 +1,6 @@
 import Popup from "./Popup";
 import ClockingTable from "./ClockingTable";
+import Months from "./Months";
 import KeycardsList from "./KeycardsList";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -35,7 +36,7 @@ const Options = ({ user, supervised, onDeleted }) => {
 			{supervised && <button onClick={() => setShowConfirmDelete(true)}>Poista henkilö</button>}
 			{message && <span className="badge">{message}</span>}
 			<Popup open={showTable} onClose={() => setShowTable(false)} exitText='Sulje'>
-				<ClockingTable user={user} />
+				<Months user={user} />
 			</Popup>
 					<Popup open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)} exitText='Peruuta'>
 				<h2>Oletko varma, että haluat poistaa käyttäjän?</h2>

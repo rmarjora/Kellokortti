@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { getLateMinutes } from '../utils.js';
 import { getAllowedLateMinutes } from '../config.js';
 
-const ClockingTable = ({ user }) => {
+const ClockingTable = ({ user, startDate, endDate }) => {
   const [arrivals, setArrivals] = useState([]);
-  const [startDate, setStartDate] = useState(null); // user creation date
   const [staff, setStaff] = useState([]);
   const allowedLateMinutes = getAllowedLateMinutes();
+
+  console.log("ClockingTable props:", { user, startDate, endDate });
 
   useEffect(() => {
     const fetchArrivals = async () => {
@@ -15,16 +16,19 @@ const ClockingTable = ({ user }) => {
         window.api.getUser(user.id),
         window.api.getStaff()
       ]);
-      setArrivals(data);
-      setStaff(Array.isArray(staffList) ? staffList : []);
-      console.log("Fetched arrivals for user", user.id, data);
-      // Prefer user's creation time; fallback to earliest arrival
-      const created = fullUser?.time_created ? new Date(fullUser.time_created) : null;
-      const earliestArrival = data.length > 0
-        ? new Date(Math.min(...data.map(a => new Date(a.arrivalTime).getTime())))
-        : null;
-  const start = (created && !Number.isNaN(created.getTime())) ? created : (earliestArrival ?? null);
-      setStartDate(start);
+      // Set arrivals to only those within the date range if specified
+      let filteredArrivals = data;
+      if (startDate) {
+        const startTime = startDate.getTime();
+        const endTime = endDate ? endDate.getTime() + 86399999 : null; // include entire end day
+        if (endTime !== null) {
+          filteredArrivals = filteredArrivals.filter(a => {
+            const arrivalTime = new Date(a.arrivalTime).getTime();
+            return arrivalTime >= startTime && arrivalTime <= endTime;
+          });
+        }
+      }
+      setArrivals(filteredArrivals);
     };
 
     fetchArrivals();
@@ -59,13 +63,14 @@ const ClockingTable = ({ user }) => {
   if (startDate) {
     const cursor = new Date(startDate);
     cursor.setHours(0,0,0,0);
-    const endDate = new Date();
-    endDate.setHours(0,0,0,0);
+    // Always clone endDate before mutating
+    let effectiveEnd = endDate ? new Date(endDate) : null;
+    if (effectiveEnd) effectiveEnd.setHours(0,0,0,0);
     // Exclude today unless already clocked in today
-    if (!hasTodayArrival) {
-      endDate.setDate(endDate.getDate() - 1);
+    if (!hasTodayArrival && effectiveEnd) {
+      effectiveEnd.setDate(effectiveEnd.getDate() - 1);
     }
-    while (cursor <= endDate) {
+    while (effectiveEnd && cursor <= effectiveEnd) {
       const day = cursor.getDay(); // 0 Sun ... 6 Sat
       if (day >= 1 && day <= 5) {
         days.push(new Date(cursor));
@@ -82,6 +87,7 @@ const ClockingTable = ({ user }) => {
   return (
     <div>
       <h2>Kellotukset käyttäjälle: {user.name}</h2>
+      <h3>Aikaväli {startDate?.toLocaleDateString('fi-FI')} - {endDate?.toLocaleDateString('fi-FI')}</h3>
   <div className="table-container card">
   <table className="data-table">
         <thead>
