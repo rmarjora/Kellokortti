@@ -29,6 +29,7 @@ const ClockingTable = ({ user, startDate, endDate }) => {
         }
       }
       setArrivals(filteredArrivals);
+      setStaff(staffList);
     };
 
     fetchArrivals();
