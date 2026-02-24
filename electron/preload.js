@@ -45,6 +45,11 @@ contextBridge.exposeInMainWorld('api', {
     const listener = (event, payload) => cb(payload);
     ipcRenderer.on('keycard-scanned', listener);
     return () => ipcRenderer.removeListener('keycard-scanned', listener);
+  },
+  onResume: (cb) => {
+    const listener = () => cb();
+    ipcRenderer.on('system-resume', listener);
+    return () => ipcRenderer.removeListener('system-resume', listener);
   }
 });
 

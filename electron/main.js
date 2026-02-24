@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
 const path = require('path');
 const https = require('https');
 const http = require('http');
@@ -68,6 +68,12 @@ server.listen(port, () => {
 app.whenReady().then(() => {
   db.initDatabase();
   createWindow();
+
+  powerMonitor.on('resume', () => {
+    if (mainWindow) {
+      mainWindow.webContents.send('system-resume');
+    }
+  });
 });
 
 // IPC handlers

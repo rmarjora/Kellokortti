@@ -41,10 +41,12 @@ const NameList = ({ people, supervised }) => {
 
     scheduleNextMidnight();
     window.addEventListener('focus', refetchArrivals);
+    const unsubResume = window.api?.onResume?.(() => refetchArrivals());
 
     return () => {
       if (timerId) clearTimeout(timerId);
       window.removeEventListener('focus', refetchArrivals);
+      if (typeof unsubResume === 'function') unsubResume();
     };
   }, [refetchArrivals]);
 

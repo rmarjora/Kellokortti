@@ -126,6 +126,7 @@ function deleteUser(userId) {
   try {
     db.prepare('DELETE FROM passwordhashes WHERE user_id = ?').run(userId);
     db.prepare('DELETE FROM arrivalTimes WHERE user_id = ?').run(userId);
+    db.prepare('DELETE FROM keycards WHERE user_id = ?').run(userId);
     const info = db.prepare('DELETE FROM users WHERE id = ?').run(userId);
     return info.changes > 0;
   } catch (e) {
@@ -201,7 +202,7 @@ function deleteCard(cardId) {
 function getArrivalToday(userId) {
   const currentTime = new Date().toISOString();
   const row = db
-    .prepare("SELECT arrival_id AS id, arrival_time, supervisor_id FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time) = DATE(?) ORDER BY arrival_time ASC LIMIT 1")
+    .prepare("SELECT arrival_id AS id, arrival_time, supervisor_id FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time, 'localtime') = DATE(?, 'localtime') ORDER BY arrival_time ASC LIMIT 1")
     .get(userId, currentTime);
   return row ? { id: row.id, arrivalTime: row.arrival_time, supervisorId: row.supervisor_id } : null;
 }
@@ -213,7 +214,7 @@ function addArrival(userId, arrivalTime = null) {
   // Prevent multiple arrivals for the same local calendar day
   const existingArrival = db
     .prepare(
-      "SELECT (arrival_time) FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time) = DATE(?)"
+      "SELECT (arrival_time) FROM arrivalTimes WHERE user_id = ? AND DATE(arrival_time, 'localtime') = DATE(?, 'localtime')"
     )
     .get(userId, currentTime);
 
@@ -256,7 +257,7 @@ function getArrivalSupervisor(arrivalId) {
 function getTodaysArrivals() {
   const currentTime = new Date().toISOString();
   return db
-    .prepare("SELECT * FROM arrivalTimes WHERE DATE(arrival_time) = DATE(?)")
+    .prepare("SELECT * FROM arrivalTimes WHERE DATE(arrival_time, 'localtime') = DATE(?, 'localtime')")
     .all(currentTime).map(row => ({
       id: row.arrival_id,
       userId: row.user_id,
