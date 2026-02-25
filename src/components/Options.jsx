@@ -38,8 +38,8 @@ const Options = ({ user, supervised, onDeleted }) => {
 			<Popup open={showTable} onClose={() => setShowTable(false)} exitText='Sulje'>
 				<Months user={user} />
 			</Popup>
-					<Popup open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)} exitText='Peruuta'>
-				<h2>Oletko varma, että haluat poistaa käyttäjän?</h2>
+			<Popup open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)} exitText='Peruuta'>
+				<h2>Oletko varma, että haluat poistaa käyttäjän {user.name}?</h2>
 				<p>Tämä poistaa käyttäjän ja kaikki hänen kellotuksensa pysyvästi.</p>
 						<button className="danger" onClick={handleDelete}>Poista</button>
 			</Popup>

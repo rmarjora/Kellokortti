@@ -3,8 +3,7 @@
   /* Surfaces */
   --bg: radial-gradient(1200px 800px at 10% 10%, #0b1220 0%, #0b1020 35%, #0a0f1c 70%, #0a0d17 100%);
   --card-bg: #0f172a; /* slate-900 */
-  --tile-bg-1: #121a2d; /* slightly lighter surface */
-  --tile-bg-2: #0c1424;
+  --tile-bg: #0c1424;
   /* Text */
   --text: #e5e7eb; /* slate-200 */
   --muted: #9ca3af; /* slate-400 */
@@ -41,6 +40,20 @@
   --table-row: rgba(255, 255, 255, 0.02);
   --table-row-alt: rgba(255, 255, 255, 0.04);
   --table-hover: rgba(124, 58, 237, 0.12);
+
+  /* Inner fills */
+  --fill-normal-1: #121a2d; /* slightly lighter surface */
+  --fill-normal-2: #0c1424;
+  --fill-arrived-1: #d1fae5; /* green-100 */
+  --fill-arrived-2: #a7f3d0; /* green-200 */
+
+  /* Border gradients */
+  --border-normal-1: #7c3aedaa;
+  --border-normal-2: #06b6d4aa;
+  --border-arrived-2: #10b93daa;
+  --border-arrived-1: #06d4aeaa;
+
+  /* Tile width for scaling */
 }
 
 /* Light mode override intentionally removed to force dark theme */
@@ -61,7 +74,7 @@ body {
 }
 
 .admin-panel {
-  margin: 1rem;
+  margin: 0.75rem 0;
 }
 
 /* App wrapper */
@@ -133,18 +146,20 @@ h1 {
   position: relative;
   max-height: 50vh; /* tighten to ~50% of viewport height */
   width: 100%;
+  box-sizing: border-box;
   overflow: hidden; /* hide overflow before scaling */
   display: flex;
   justify-content: center;
-  padding: 0.5rem 1.5rem 1.25rem; /* reduced padding to further shrink footprint */
+  padding: 0.75rem 1.5rem; /* reduced padding to further shrink footprint */
 }
 
 /* When scaled, ensure the container reserves the original space to avoid clipping */
-.name-list-wrapper .name-list { margin: 0; }
+.name-list-wrapper .name-list { margin: 0; width: 100%; }
 
 /* Name list stats (arrived/total) under the list, aligned to the right */
 .name-list-block {
   position: relative; /* anchor for absolute stats */
+  width: 100%;
 }
 .name-list-stats {
   position: absolute;
@@ -178,11 +193,22 @@ h1 {
   text-overflow: ellipsis;
   text-align: center;
   transition: transform 120ms ease, box-shadow 200ms ease;
+
+  /* Working two-layer background */
+  background:
+    linear-gradient(var(--fill-normal-1), var(--fill-normal-2)) padding-box, 
+    linear-gradient(135deg, var(--border-normal-1), var(--border-normal-2)) border-box;
+}
+
+.clickable-name.arrived {
+  background:
+    linear-gradient(var(--fill-arrived-1), var(--fill-arrived-2)) padding-box, 
+    linear-gradient(135deg, var(--border-arrived-1), var(--border-arrived-2)) border-box;
+  color: #000;
 }
 
 .clickable-name:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  transform: translateY(-2px);
 }
 
 .clickable-name:focus,
@@ -422,6 +448,12 @@ input[type="text"], input[type="password"], input[type="email"], input[type="tel
   transition: box-shadow 180ms ease, border-color 180ms ease;
 }
 
+.time-input {
+  color: var(--text);
+  margin: 0.1rem;
+  border: 10%;
+}
+
 input:focus, select:focus {
   outline: none;
   border-color: var(--primary);
@@ -553,7 +585,7 @@ button:active {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 0; /* consistent vertical rhythm */
+  padding: 5px 0; /* consistent vertical rhythm */
 }
 .contact-row > button {
   margin: 0; /* avoid extra vertical margin affecting row spacing */
@@ -602,7 +634,7 @@ table.data-table td.clocking-absent {
 }
 
 .app-footer {
-  padding: 20px;
+  padding: 10px;
 }
 
 .submit-button {
