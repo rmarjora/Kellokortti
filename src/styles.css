@@ -146,6 +146,7 @@ h1 {
   position: relative;
   max-height: 50vh; /* tighten to ~50% of viewport height */
   width: 100%;
+  box-sizing: border-box;
   overflow: hidden; /* hide overflow before scaling */
   display: flex;
   justify-content: center;
@@ -153,11 +154,12 @@ h1 {
 }
 
 /* When scaled, ensure the container reserves the original space to avoid clipping */
-.name-list-wrapper .name-list { margin: 0; }
+.name-list-wrapper .name-list { margin: 0; width: 100%; }
 
 /* Name list stats (arrived/total) under the list, aligned to the right */
 .name-list-block {
   position: relative; /* anchor for absolute stats */
+  width: 100%;
 }
 .name-list-stats {
   position: absolute;
@@ -206,7 +208,7 @@ h1 {
 }
 
 .clickable-name:hover {
-  transform: translateY(-1px);
+  transform: translateY(-3px);
 }
 
 .clickable-name:focus,

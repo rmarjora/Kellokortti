@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStaff, deleteStaffAsync } from '../store/staffSlice';
 import Contact from './Contact';
@@ -9,10 +9,29 @@ const ContactList = ({ isAdmin = false }) => {
   const { items: staff, status, error } = useSelector(state => state.staff);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
   if (status === 'idle' && window?.api?.getStaff) dispatch(fetchStaff());
   }, [status, dispatch]);
+
+  // Set max-height to remaining viewport space below the list
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let rafId;
+    let lastTop = -1;
+    const check = () => {
+      const top = el.getBoundingClientRect().top;
+      if (top !== lastTop) {
+        lastTop = top;
+        el.style.maxHeight = `${window.innerHeight - top - 16}px`;
+      }
+      rafId = requestAnimationFrame(check);
+    };
+    rafId = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(rafId);
+  }, [staff.length]);
   
   const handleDeleteWarning = (id) => {
     if (!isAdmin) return;
@@ -29,7 +48,7 @@ const ContactList = ({ isAdmin = false }) => {
   };
 
   const content = status === 'loading' ? <div>Ladataan…</div> : staff.length === 0 ? <p>Henkilökuntaa ei ole</p> : (
-    <div className="contact-list-scroll" role="region" aria-label="Henkilökunnan lista">
+    <div className="contact-list-scroll" ref={scrollRef} role="region" aria-label="Henkilökunnan lista">
       {staff.map((s) => (
         <div key={s.id} className="contact-row">
           <Contact staff={s} />
