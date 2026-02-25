@@ -506,7 +506,7 @@ button:active {
 /* Scrollable contact list to prevent overflow offscreen */
 .contact-list-scroll {
   overflow-y: auto;
-  max-height: 10vh; /* adjust as needed to fit page layout */
+  overflow-y: auto;
   padding-right: 0.25rem; /* space for scrollbar without shifting */
 }
 
