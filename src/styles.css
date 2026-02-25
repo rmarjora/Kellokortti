@@ -74,7 +74,7 @@ body {
 }
 
 .admin-panel {
-  margin: 1rem;
+  margin: 0.75rem 0;
 }
 
 /* App wrapper */
@@ -150,7 +150,7 @@ h1 {
   overflow: hidden; /* hide overflow before scaling */
   display: flex;
   justify-content: center;
-  padding: 0.5rem 1.5rem 1.25rem; /* reduced padding to further shrink footprint */
+  padding: 0.75rem 1.5rem; /* reduced padding to further shrink footprint */
 }
 
 /* When scaled, ensure the container reserves the original space to avoid clipping */
@@ -208,7 +208,7 @@ h1 {
 }
 
 .clickable-name:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .clickable-name:focus,
@@ -446,6 +446,12 @@ input[type="text"], input[type="password"], input[type="email"], input[type="tel
   background: var(--input-bg);
   color: var(--text);
   transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.time-input {
+  color: var(--text);
+  margin: 0.1rem;
+  border: 10%;
 }
 
 input:focus, select:focus {

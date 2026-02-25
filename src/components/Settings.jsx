@@ -43,16 +43,16 @@ const Settings = () => {
 
   return (
     <>
-      <h3>Työpäivän setukset</h3>
+      <h3>Työpäivän asetukset</h3>
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <label>
           Työpäivän aloitusaika:
-          <input type="number" min={0} max={23} value={hour} onChange={e => setHour(e.target.value)} style={{ width: 70, marginLeft: 8 }} />:
-          <input type="number" min={0} max={59} value={minute} onChange={e => setMinute(e.target.value)} style={{ width: 70 }} />
+          <input type="number" min={0} max={23} value={hour} onChange={e => setHour(e.target.value)} style={{ width: 68.5, marginLeft: 8 }} className="time-input" />:
+          <input type="number" min={0} max={59} value={minute} onChange={e => setMinute(e.target.value)} style={{ width: 68.5 }} className="time-input" />
         </label>
         <label>
           Sallittu myöhästyminen (min):
-          <input type="number" min={0} max={180} value={allowedLate} onChange={e => setAllowedLate(e.target.value)} style={{ width: 88, marginLeft: 8 }} />
+          <input type="number" min={0} max={180} value={allowedLate} onChange={e => setAllowedLate(e.target.value)} style={{ width: 88, marginLeft: 8 }} className="time-input" />
         </label>
         <button type="button" onClick={save} disabled={saving}>Tallenna</button>
         {msg && <span className="badge">{msg}</span>}
