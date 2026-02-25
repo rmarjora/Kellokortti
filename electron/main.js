@@ -123,6 +123,7 @@ ipcMain.handle('clear-all-arrivals', () => db.clearAllArrivals());
 ipcMain.handle('get-todays-arrivals', () => db.getTodaysArrivals());
 ipcMain.handle('get-staff-list', () => db.getStaffList());
 ipcMain.handle('get-staff', () => db.getStaff());
+ipcMain.handle('get-all-staff', () => db.getAllStaff());
 ipcMain.handle('add-staff', (event, staff) => db.addStaff(staff));
 ipcMain.handle('delete-staff', (event, id) => db.deleteStaff(id));
 // Settings handlers

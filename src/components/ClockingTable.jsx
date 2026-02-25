@@ -14,7 +14,7 @@ const ClockingTable = ({ user, startDate, endDate }) => {
       const [data, fullUser, staffList] = await Promise.all([
         window.api.getArrivals(user.id),
         window.api.getUser(user.id),
-        window.api.getStaff()
+        window.api.getAllStaff()
       ]);
       // Set arrivals to only those within the date range if specified
       let filteredArrivals = data;

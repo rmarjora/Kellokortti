@@ -69,7 +69,7 @@ const ContactList = ({ isAdmin = false }) => {
     </div>
 				<Popup open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)} exitText='Peruuta'>
 				<h2>Oletko varma, että haluat poistaa henkilön {staff.find(s => s.id === deleteId)?.name}?</h2>
-				<p>Tämä poistaa kaikki annetut luvat pysyvästi.</p>
+				<p>Tämä poistaa henkilön listalta.</p>
 						<button className="danger" onClick={handleDelete}>Poista</button>
 			</Popup>
       </>

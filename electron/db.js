@@ -20,8 +20,14 @@ function initDatabase() {
     name TEXT,
     email TEXT,
     phone1 TEXT,
-    phone2 TEXT
+    phone2 TEXT,
+    disabled INTEGER NOT NULL DEFAULT 0
   )`)
+  // Add disabled column if missing (existing databases)
+  const staffCols = db.prepare("PRAGMA table_info(staff)").all();
+  if (!staffCols.some(c => c.name === 'disabled')) {
+    db.exec("ALTER TABLE staff ADD COLUMN disabled INTEGER NOT NULL DEFAULT 0");
+  }
   db.exec(`CREATE TABLE IF NOT EXISTS passwordhashes (
     user_id INTEGER,
     password_hash TEXT,
@@ -59,7 +65,11 @@ function initDatabase() {
 }
 
 function getStaff() {
-  return db.prepare('SELECT id, name, email, phone1, phone2 FROM staff').all();
+  return db.prepare('SELECT id, name, email, phone1, phone2 FROM staff WHERE disabled = 0').all();
+}
+
+function getAllStaff() {
+  return db.prepare('SELECT id, name, email, phone1, phone2, disabled FROM staff').all();
 }
 
 function getStaffList() {
@@ -76,7 +86,7 @@ function addStaff(staff) {
 
 function deleteStaff(id) {
   try {
-    const info = db.prepare('DELETE FROM staff WHERE id = ?').run(id);
+    const info = db.prepare('UPDATE staff SET disabled = 1 WHERE id = ?').run(id);
     return info.changes > 0;
   } catch (e) {
     console.error('deleteStaff failed', e);
@@ -277,7 +287,7 @@ module.exports = {
   // Arrivals
   addArrival, getArrivalToday, getArrivals, clearAllArrivals, setArrivalSupervisor, getArrivalSupervisor, getTodaysArrivals,
   // Staff
-  getStaff, getStaffList, addStaff, deleteStaff,
+  getStaff, getAllStaff, getStaffList, addStaff, deleteStaff,
   // Admin password helpers
   setAdminPassword, compareAdminPassword, adminPasswordExists, clearAdminPassword
 };

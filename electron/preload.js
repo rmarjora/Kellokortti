@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('api', {
   // Staff
   getStaffList: () => ipcRenderer.invoke('get-staff-list'),
   getStaff: () => ipcRenderer.invoke('get-staff'),
+  getAllStaff: () => ipcRenderer.invoke('get-all-staff'),
   addStaff: (staff) => ipcRenderer.invoke('add-staff', staff),
   deleteStaff: (id) => ipcRenderer.invoke('delete-staff', id),
   // Settings
